@@ -54,14 +54,12 @@ ProjectWise provides features such as:
 
 ## ✪ System Architecture
 
-At the core of the system is a **Decision Engine** that integrates multiple modules:
 
-- Algorithmic Optimization Layer  
-- Machine Learning Intelligence Layer  
-- Risk Analysis Engine  
-- Budget Planning System  
+ <p align="left">
+  <img src="assets/image.png" width="1800" alt="Architecure"/>
+</p>
 
-These modules work together to deliver **real-time, data-driven recommendations**.
+
 
 ---
 
