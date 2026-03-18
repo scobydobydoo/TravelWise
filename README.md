@@ -1,7 +1,7 @@
 <h1 align="center">TravelWise </h1>
 
 <p align="center">
-  <img src="assets/assets/eeea21c2-8a22-40e2-a222-e33285d345dd.png" width="180" alt="ProjectWise Logo"/>
+  <img src="assets/eeea21c2-8a22-40e2-a222-e33285d345dd.png" width="180" alt="ProjectWise Logo"/>
 </p>
 
 <p align="center">
