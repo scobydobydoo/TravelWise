@@ -1,4 +1,4 @@
-<p align="center"> 🌍 ProjectWise </p>
+<h1 align="center">TravelWise </h1>
 
 <p align="center">
   <img src="assets/logo.png" width="180" alt="ProjectWise Logo"/>
@@ -9,16 +9,16 @@ Intelligent Tourist Assistance and Decision Support Platform
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Python-3.10-blue" />
-  <img src="https://img.shields.io/badge/Machine%20Learning-Enabled-green" />
+  <img src="https://img.shields.io/badge/cpp-3.10-blue" />
   <img src="https://img.shields.io/badge/Algorithms-DAA-orange" />
+  <img src="https://img.shields.io/badge/Machine%20Learning-Enabled-green" />
   <img src="https://img.shields.io/badge/Status-Development-yellow" />
   <img src="https://img.shields.io/badge/License-MIT-lightgrey" />
 </p>
 
 ---
 
-## 🌍 Project Overview
+## ✪ Project Overview
 
 ProjectWise is an intelligent decision-support platform designed to help tourists make **safe, cost-effective, and informed travel decisions**.
 
@@ -28,7 +28,7 @@ Instead of relying on static recommendations, ProjectWise dynamically evaluates 
 
 ---
 
-## 🚨 Problem Statement
+## ✪ Problem Statement
 
 Tourists often struggle with:
 
@@ -37,13 +37,12 @@ Tourists often struggle with:
 - Poor budget allocation during trips  
 - Lack of awareness about high-risk or scam-prone areas  
 
-Existing platforms focus mainly on booking or navigation, but fail to provide **integrated decision support combining pricing intelligence, safety, and optimization**.
 
 ---
 
-## 💡 Solution
+## ✪ Solution
 
-ProjectWise provides a unified intelligent assistant that:
+ProjectWise provides features such as:
 
 - Estimates **fair prices** for transport and services  
 - Recommends **safe and efficient routes**  
@@ -53,7 +52,7 @@ ProjectWise provides a unified intelligent assistant that:
 
 ---
 
-## 🧠 System Architecture
+## ✪ System Architecture
 
 At the core of the system is a **Decision Engine** that integrates multiple modules:
 
@@ -66,7 +65,7 @@ These modules work together to deliver **real-time, data-driven recommendations*
 
 ---
 
-## ⚙️ Core Modules
+## ✪ Core Modules
 
 ### 1. Price Intelligence Module
 - Regression models for fair price estimation  
@@ -105,11 +104,11 @@ These modules work together to deliver **real-time, data-driven recommendations*
 
 ---
 
-## 🛠️ Tools & Technologies
+## ✪ Tools & Technologies
 
-- **Languages:** Python / C++  
+- **Languages:** C++ / Python
+- **Algorithms:** Graphs, DP, Greedy, Priority Queues
 - **Machine Learning:** Scikit-learn, NumPy, Pandas  
-- **Algorithms:** Graphs, DP, Greedy, Priority Queues  
 - **Visualization:** Matplotlib  
 - **Version Control:** Git & GitHub  
 
