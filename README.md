@@ -116,7 +116,7 @@ ProjectWise provides features such as:
 
 ```bash
 projectwise/
-│── data/                  # datasets
+│── data/                  
 │── algorithms/
 │   ├── graph/
 │   ├── dp/
@@ -124,8 +124,8 @@ projectwise/
 │── ml/
 │   ├── regression/
 │   ├── classification/
-│── core/                  # main decision engine
-│── utils/                 # helper functions
-│── main.py                # entry point
+│── core/                 
+│── utils/                
+│── main.py                
 │── requirements.txt
 │── README.md
