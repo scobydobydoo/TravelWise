@@ -1,15 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title> TRAVELWISE</title>
-    </head>
-    <body>
-        <h2>Welcome to TravelWise</h2>
-        <p>Select city: Rishikesh</p>
-        <button onclick ="location.href='plan.html'">Plan Trip</button>
-        <button onclick ="location.href='price.html'">Check price</button>
-        <button onclick ="location.href='route.html'">View routes</button>
-   
-    
-    </body>
-    </html>
+    <title>TravelWise</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="app-body">
+
+<div class="app-container">
+
+    <h1> TravelWise</h1>
+    <p>  Select your exploration</p>
+
+    <div class="grid">
+
+        <div class="card" onclick="goCity()">
+            <h3> Rishikesh</h3>
+            <p>Explore the adventure capital of India </p>
+        </div>
+
+        <div class="card disabled">
+            <h3> More Cities</h3>
+            <p>Coming Soon</p>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+function goCity() {
+    window.location.href = "city.html";
+}
+</script>
+
+</body>
+</html>
