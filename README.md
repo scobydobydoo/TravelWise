@@ -1,4 +1,4 @@
-<h1 align="center">TravelWise by dpkbkl</h1>
+<h1 align="center">TravelWise </h1>
 
 <p align="center">
   <img src="assets/eeea21c2-8a22-40e2-a222-e33285d345dd.png" width="400" alt="ProjectWise Logo"/>
