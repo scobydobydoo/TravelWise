@@ -1,18 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title> SIGNUP</title>
-    </head>
-    <body>
-        <h1>Signup</h1>
+    <title>Signup</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-body">
 
-        <input type ="text" id="username"
-        placeholder="username"<br><br>>
-        <input type ="password" id="password"
-        placeholder="password"<br><br>>
-        <button onclick ="signup()">signup</button>
-        
-    <p id = "msg"></p>
-    <script src="script.js"></script> 
-    </body>
-    </html>
+<div class="auth-container">
+    <h2>TravelWise</h2>
+    <p>Create your account</p>
+
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+
+    <button onclick="signup()">Signup</button>
+
+    <p id="msg"></p>
+
+    <a href="login.html">Already have an account? Login</a>
+</div>
+
+<script src="auth.js"></script>
+
+</body>
+</html>
