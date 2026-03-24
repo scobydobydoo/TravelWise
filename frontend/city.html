@@ -4,26 +4,26 @@
     <title>Rishikesh</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="app-body">
+<body class="appcity-body">
 
-<div class="app-container">
+<div class="appcity-container">
 
     <h2> Rishikesh</h2>
     <p>  Select what you want to explore</p>
 
     <div class="grid">
 
-        <div class="card" onclick="goRoute()">
+        <div class="card" onclick="goBudget()">
             <h3> Smart Budgeting</h3>
             <p> Budget like a pro</p>
         </div>
 
-        <div class="card disabled">
+        <div class="card" onclick="goPrice()">
             <h3> Price Estimator</h3>
             <p> No more price scams! </p>
         </div>
 
-        <div class="card disabled">
+        <div class="card" onclick="goRoute()">
             <h3> Transport Guide </h3>
             <p> Explore with savings </p>
         </div>
@@ -48,6 +48,10 @@
 </div>
 
 <script>
+function goBudget() {
+    window.location.href = "budget.html";
+}
+
 function goRoute() {
     window.location.href = "route.html";
 }

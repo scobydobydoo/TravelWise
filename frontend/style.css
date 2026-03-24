@@ -1,13 +1,11 @@
-
 body {
     margin: 0;
-    font-family: Arial;
+    font-family: Arial, sans-serif;
 }
 
 
 .auth-body {
-    background: linear-gradient(135deg, #73caed, #ad82d7);
-
+    background: linear-gradient(135deg, #eff8fc, #6dc0dc);
     height: 100vh;
     display: flex;
     justify-content: center;
@@ -15,133 +13,88 @@ body {
 }
 
 .auth-container {
-    background: rgb(209, 219, 214);
+    background: #ffffff;
     padding: 35px;
     border-radius: 15px;
     width: 320px;
     text-align: center;
-
-    box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
 }
 
 
 .app-body {
-    background: #d7e3a8;   
-
+    margin: 0;
     height: 100vh;
+
+    background: 
+        linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+        url("images/indeximg-bg.png") no-repeat center center/cover;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.app-container {
+    background: #95ce8c;
+    padding: 40px;
+    border-radius: 20px;
+    width: 750px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.appcity-body {
+    margin: 0;
+    height: 100vh;
+
+    background: url("images/rishikesh-bg.png") no-repeat center center/cover;
+
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-
-.app-container {
-    background: rgb(165, 199, 161);
+.appcity-container {
+    background: #9be0de;
     padding: 40px;
     border-radius: 20px;
-    width: 750px;
+    width: 800px;
 
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 
 
-.app-container h1,
-.app-container h2 {
+.appcity-container h2 {
     margin-bottom: 10px;
+    color: #222;
 }
 
-.app-container p {
+.appcity-container p {
     color: #555;
     margin-bottom: 20px;
 }
 
-input {
-    width: 90%;
-    padding: 12px;
-    margin: 10px 0;
-
-    border-radius: 8px;
-    border: 1px solid #ddd;
-}
-
-
-button {
-    width: 95%;
-    padding: 12px;
-
-    border: none;
-    border-radius: 8px;
-
-    background: #667eea;
-    color: white;
-    font-size: 16px;
-
-    cursor: pointer;
-}
-
-button:hover {
-    background: #5a67d8;
-}
-
 
 .grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
-    margin-top: 30px;
+    margin-top: 20px;
 }
-
 
 .card {
-    background: #f5f7fa;
-    padding: 30px;
-    border-radius: 15px;
-    cursor: pointer;
-
-    transition: 0.3s;
-}
-
-.card:hover {
-    background: #66a6ff;
-    color: white;
-    transform: translateY(-5px);
-}
-
-.card.disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-.card.disabled:hover {
-    background: #f5f7fa;
-    color: black;
-    transform: none;
-}
-
-
-#msg {
-    margin-top: 10px;
-}
-
-.grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-}
-
-
-.card {
-    background: #f8f9fc;
+    background: #ffffff;
     padding: 25px;
     border-radius: 15px;
-    cursor: pointer;
+    border: 1px solid #e0e0e0;
 
-    transition: 0.25s;
-    text-align: left;
+    cursor: pointer;
+    transition: all 0.25s ease;
 }
+
 
 .card h3 {
     margin-bottom: 8px;
+    color: #222;
 }
 
 .card p {
@@ -150,23 +103,46 @@ button:hover {
 }
 
 
-.card:hover {
+.card:not(.disabled):hover {
     background: #667eea;
-    color: white;
-    transform: translateY(-4px);
+    color: rgb(201, 201, 201);
+    transform: translateY(-5px);
 }
 
-.card:hover p {
+.card:not(.disabled):hover p {
     color: #ddd;
 }
 
+
 .card.disabled {
-    opacity: 0.6;
+    background: #ffffff;
+    color: #222;
+    opacity: 0.8;
     cursor: not-allowed;
+
+    pointer-events: none;   /* 🔥 IMPORTANT */
 }
 
-.card.disabled:hover {
-    background: #f8f9fc;
-    color: black;
-    transform: none;
+input {
+    width: 90%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+
+button {
+    width: 95%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: #667eea;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #5a67d8;
 }

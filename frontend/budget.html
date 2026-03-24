@@ -1,0 +1,49 @@
+<script>
+async function getPlan() {
+    let tier = document.getElementById("tier").value;
+    let days = document.getElementById("days").value;
+
+
+    if (!tier || !days) {
+        alert("Please enter all fields");
+        return;
+    }
+
+    let prefs = [];
+    document.querySelectorAll("input[name='pref']:checked")
+        .forEach(el => prefs.push(el.value));
+
+    document.getElementById("result").innerText = "Generating your plan... ⏳";
+
+    try {
+        let response = await fetch("http://127.0.0.1:5000/plan", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                tier: tier,
+                days: days,
+                prefs: prefs
+            })
+        });
+
+        let data = await response.json();
+
+        if (data.status === "success") {
+            document.getElementById("result").innerText = data.output;
+        } else {
+            document.getElementById("result").innerText = "Error: " + data.message;
+        }
+
+    } catch (error) {
+        document.getElementById("result").innerText = "Server error ⚠️";
+        console.error(error);
+    }
+}
+</script>
+<button onclick="getPlan()" style="padding:10px 20px; border-radius:8px; cursor:pointer;">
+    Generate Plan 🚀
+</button>
+
+<pre id="result" style="margin-top:20px; background:#f5f5f5; padding:15px; border-radius:10px;"></pre>

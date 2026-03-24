@@ -1,7 +1,7 @@
 import sqlite3
 
 def init_db():
-    conn = sqlite3.connect("travel.db")
+    conn = sqlite3.connect("users.db")
     cur = conn.cursor()
 
     cur.execute("""
@@ -17,6 +17,6 @@ def init_db():
 
 
 def get_db():
-    conn = sqlite3.connect("travel.db")
+    conn = sqlite3.connect("users.db")
     conn.row_factory = sqlite3.Row
     return conn

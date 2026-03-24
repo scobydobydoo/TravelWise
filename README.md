@@ -15,7 +15,6 @@ Intelligent Tourist Assistance and Decision Support Platform
   <img src="https://img.shields.io/badge/Status-Development-yellow" />
   <img src="https://img.shields.io/badge/License-MIT-lightgrey" />
 </p>
-
 ---
 
 ## ✪ Project Overview
