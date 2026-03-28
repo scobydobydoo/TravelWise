@@ -1,258 +1,332 @@
+
 #include <iostream>
 #include <vector>
 #include <string>
-#include <map>
 #include <algorithm>
 using namespace std;
 
+// DATA STRUCTURES
+struct Hotel {
+    string name;
+    int price;
+    float rating;
+};
+
+struct Restaurant {
+    string name;
+    int price;
+    float rating;
+};
+
 struct Activity {
-    string name, category, location;
-    int cost;
-    float hours, rating;
-};
-
-struct Accommodation {
-    string name, location;
+    string name;
+    string type;      // Adventure, Spiritual, Nature
     int cost;
     float rating;
 };
 
-struct FoodPlace {
-    string name, cuisine;
-    int cost;
-    float rating;
-};
-
-struct Transport {
-    string mode;
-    int cost;
-};
-
+// MAIN PLANNER CLASS
 class RishikeshPlanner {
-    map<int, int> dailyBudget = {{1,1200},{2,2500},{3,4500},{4,8000},{5,15000}};
-    
-    vector<Accommodation> stays[6];
-    vector<FoodPlace> foods[6];
-    vector<Activity> activities;
-    Transport trans[6];
+private:
+    int budgetPerDay[6];
+    Hotel hotels[6][3];
+    Restaurant restaurants[6][3];
+    Activity allActivities[20];
+    int activityCount;
     
 public:
+    // Constructor - Load all data
     RishikeshPlanner() {
-       
-        stays[1] = {{"Zostel Rishikesh","Tapovan",400,4.2},{"GoStops","Laxman Jhula",350,4.0},{"Shantiyoga Ashram","Ram Jhula",500,4.3}};
-        stays[2] = {{"Moustache","Tapovan",800,4.1},{"Hotel Yog Vashishth","Tapovan",1200,3.8},{"Divine Resort","Laxman Jhula",1500,4.0}};
-        stays[3] = {{"Hotel Ganga Kinara","Laxman Jhula",2800,4.2},{"Sterling Palm Bliss","Swargashram",3000,4.3},{"The Forest Resort","Tapovan",3500,4.4}};
-        stays[4] = {{"Aloha on Ganges","Laxman Jhula",7000,4.6},{"Ganga Beach Resort","Tapovan",6500,4.5}};
-        stays[5] = {{"Ananda Himalayas","Narendra Nagar",25000,4.9}};
+        // Set daily budgets for 5 tiers
+        budgetPerDay[1] = 1200;   budgetPerDay[2] = 2500;
+        budgetPerDay[3] = 4500;   budgetPerDay[4] = 8000;
+        budgetPerDay[5] = 15000;
         
+        // Hotels by tier
+        hotels[1][0] = {"Zostel Rishikesh", 400, 4.2};
+        hotels[1][1] = {"GoStops", 350, 4.0};
+        hotels[1][2] = {"Shantiyoga Ashram", 500, 4.3};
         
-        foods[1] = {{"Little Buddha Cafe","Continental",250,4.5},{"Freedom Cafe","Multicuisine",200,4.3},{"Street Food","Indian",80,4.0}};
-        foods[2] = {{"Pure Soul Cafe","Healthy",350,4.6},{"The 60's Cafe","Continental",400,4.4},{"Bhandari Swiss Cottage","Indian",300,4.2}};
-        foods[3] = {{"Chotiwala","Indian",450,4.5},{"Green Italian Cafe","Italian",600,4.7},{"Pumpernickel German","German",500,4.6}};
-        foods[4] = {{"Achanta's Restaurant","Multi",800,4.7},{"Sanskriti Cafe","Fine Dining",700,4.6}};
-        foods[5] = {{"Ananda Spa Restaurant","Gourmet",2000,4.9},{"The Sitting Elephant","Fine Dining",1500,4.8}};
+        hotels[2][0] = {"Moustache", 800, 4.1};
+        hotels[2][1] = {"Hotel Yog Vashishth", 1200, 3.8};
+        hotels[2][2] = {"Divine Resort", 1500, 4.0};
         
+        hotels[3][0] = {"Hotel Ganga Kinara", 2800, 4.2};
+        hotels[3][1] = {"Sterling Palm Bliss", 3000, 4.3};
+        hotels[3][2] = {"The Forest Resort", 3500, 4.4};
         
-        trans[1] = {"Walking + Local Bus",50};
-        trans[2] = {"Shared Auto + Bus",150};
-        trans[3] = {"Shared Auto + Taxi",300};
-        trans[4] = {"Private Taxi",600};
-        trans[5] = {"Private Car with Driver",1500};
+        hotels[4][0] = {"Aloha on Ganges", 7000, 4.6};
+        hotels[4][1] = {"Ganga Beach Resort", 6500, 4.5};
         
+        hotels[5][0] = {"Ananda Himalayas", 25000, 4.9};
         
-        activities = {
-            {"Ganga Aarti","Spiritual","Parmarth Niketan",0,1.0,4.9},
-            {"River Rafting 16km","Adventure","Shivpuri",1200,3.0,4.8},
-            {"River Rafting 36km","Adventure","Kaudiyala",2500,6.0,4.7},
-            {"Yoga Class","Spiritual","Tapovan",400,1.0,4.8},
-            {"Bungee Jumping","Adventure","Mohanchatti",3500,1.0,4.6},
-            {"Flying Fox","Adventure","Mohanchatti",2000,1.0,4.5},
-            {"Mountain Biking","Adventure","Tapovan",1500,3.0,4.4},
-            {"Temple Tour","Spiritual","All Areas",0,2.0,4.7},
-            {"Meditation Camp","Spiritual","Tapovan",800,2.0,4.6},
-            {"Neer Waterfall Trek","Nature","Neer Village",200,4.0,4.5},
-            {"Sunset Point","Nature","Tapovan",0,1.5,4.6},
-            {"Cafe Hopping","Food","Laxman Jhula",500,2.0,4.5},
-            {"Triveni Ghat","Spiritual","Triveni",0,1.0,4.7},
-            {"Kunjapuri Temple Trek","Nature","Kunjapuri",300,3.0,4.4},
-            {"Beatles Ashram","Spiritual","Tapovan",100,2.0,4.8},
-            {"Ayurvedic Massage","Wellness","Tapovan",800,1.5,4.5}
-        };
+        // Restaurants by tier
+        restaurants[1][0] = {"Little Buddha Cafe", 250, 4.5};
+        restaurants[1][1] = {"Freedom Cafe", 200, 4.3};
+        restaurants[1][2] = {"Street Food", 80, 4.0};
+        
+        restaurants[2][0] = {"Pure Soul Cafe", 350, 4.6};
+        restaurants[2][1] = {"The 60's Cafe", 400, 4.4};
+        restaurants[2][2] = {"Bhandari Swiss Cottage", 300, 4.2};
+        
+        restaurants[3][0] = {"Chotiwala", 450, 4.5};
+        restaurants[3][1] = {"Green Italian Cafe", 600, 4.7};
+        restaurants[3][2] = {"Pumpernickel German", 500, 4.6};
+        
+        restaurants[4][0] = {"Achanta's Restaurant", 800, 4.7};
+        restaurants[4][1] = {"Sanskriti Cafe", 700, 4.6};
+        
+        restaurants[5][0] = {"Ananda Spa Restaurant", 2000, 4.9};
+        
+        // Activities
+        activityCount = 0;
+        allActivities[activityCount++] = {"Ganga Aarti", "Spiritual", 0, 4.9};
+        allActivities[activityCount++] = {"Temple Tour", "Spiritual", 0, 4.7};
+        allActivities[activityCount++] = {"Triveni Ghat", "Spiritual", 0, 4.7};
+        allActivities[activityCount++] = {"Sunset Point", "Nature", 0, 4.6};
+        allActivities[activityCount++] = {"River Rafting 16km", "Adventure", 1200, 4.8};
+        allActivities[activityCount++] = {"Yoga Class", "Spiritual", 400, 4.8};
+        allActivities[activityCount++] = {"Beatles Ashram", "Spiritual", 100, 4.8};
+        allActivities[activityCount++] = {"Neer Waterfall Trek", "Nature", 200, 4.5};
+        allActivities[activityCount++] = {"Mountain Biking", "Adventure", 1500, 4.4};
+        allActivities[activityCount++] = {"Flying Fox", "Adventure", 2000, 4.5};
+        allActivities[activityCount++] = {"Bungee Jumping", "Adventure", 3500, 4.6};
+        allActivities[activityCount++] = {"River Rafting 36km", "Adventure", 2500, 4.7};
+        allActivities[activityCount++] = {"Meditation Camp", "Spiritual", 800, 4.6};
+        allActivities[activityCount++] = {"Kunjapuri Temple Trek", "Nature", 300, 4.4};
     }
     
-    void plan(int tier, int days, vector<string>& prefs) {
-        int totalBudget = dailyBudget[tier] * days;
-        
-        
-        sort(stays[tier].begin(), stays[tier].end(), [](auto &a, auto &b){return a.rating>b.rating;});
-        sort(foods[tier].begin(), foods[tier].end(), [](auto &a, auto &b){return a.rating>b.rating;});
-        
-        
-        Accommodation selectedStay;
-        int stayCost;
-        for(auto &stay : stays[tier]) {
-            stayCost = stay.cost * days;
-            int foodCost = foods[tier][0].cost * 2 * days;
-            int transportCost = trans[tier].cost * days;
-            int essentials = stayCost + foodCost + transportCost;
-            
-            if(essentials <= totalBudget) {
-                selectedStay = stay;
-                break;
-            }
+    // QUICK SORT FOR HOTELS
+    int partitionHotels(Hotel arr[], int low, int high) {
+        float pivot = arr[high].rating;
+        int i = low - 1;
+        for(int j = low; j < high; j++)
+            if(arr[j].rating >= pivot) swap(arr[++i], arr[j]);
+        swap(arr[i+1], arr[high]);
+        return i+1;
+    }
+    
+    void quickSortHotels(Hotel arr[], int low, int high) {
+        if(low < high) {
+            int pi = partitionHotels(arr, low, high);
+            quickSortHotels(arr, low, pi-1);
+            quickSortHotels(arr, pi+1, high);
         }
-        
-        if(selectedStay.name.empty()) {
-            selectedStay = stays[tier].back();
-            stayCost = selectedStay.cost * days;
+    }
+    
+    void sortHotels(Hotel arr[], int n) {
+        if(n > 1) quickSortHotels(arr, 0, n-1);
+    }
+    
+    // QUICK SORT FOR RESTAURANTS
+    int partitionRestaurants(Restaurant arr[], int low, int high) {
+        float pivot = arr[high].rating;
+        int i = low - 1;
+        for(int j = low; j < high; j++)
+            if(arr[j].rating >= pivot) swap(arr[++i], arr[j]);
+        swap(arr[i+1], arr[high]);
+        return i+1;
+    }
+    
+    void quickSortRestaurants(Restaurant arr[], int low, int high) {
+        if(low < high) {
+            int pi = partitionRestaurants(arr, low, high);
+            quickSortRestaurants(arr, low, pi-1);
+            quickSortRestaurants(arr, pi+1, high);
         }
-        
-        
-        int foodCost = foods[tier][0].cost * 2 * days;
-        int transportCost = trans[tier].cost * days;
-        int essentialsTotal = stayCost + foodCost + transportCost;
-        int activityBudget = totalBudget - essentialsTotal;
-        
-        
-        vector<Activity> validActivities;
-        for(auto &act : activities) {
-            if(!prefs.empty()) {
-                for(auto &p : prefs) {
-                    if(act.category == p) {
-                        validActivities.push_back(act);
+    }
+    
+    void sortRestaurants(Restaurant arr[], int n) {
+        if(n > 1) quickSortRestaurants(arr, 0, n-1);
+    }
+    
+    // QUICK SORT FOR ACTIVITIES (by value/cost ratio)
+    float activityValue(Activity a) {
+        if(a.cost == 0) return 999;
+        return a.rating / a.cost;
+    }
+    
+    int partitionActivities(Activity arr[], int low, int high) {
+        float pivot = activityValue(arr[high]);
+        int i = low - 1;
+        for(int j = low; j < high; j++)
+            if(activityValue(arr[j]) >= pivot) swap(arr[++i], arr[j]);
+        swap(arr[i+1], arr[high]);
+        return i+1;
+    }
+    
+    void quickSortActivities(Activity arr[], int low, int high) {
+        if(low < high) {
+            int pi = partitionActivities(arr, low, high);
+            quickSortActivities(arr, low, pi-1);
+            quickSortActivities(arr, pi+1, high);
+        }
+    }
+    
+    void sortActivities(Activity arr[], int n) {
+        if(n > 1) quickSortActivities(arr, 0, n-1);
+    }
+    
+    // FILTER ACTIVITIES BY PREFERENCES
+    int filterByPref(Activity src[], int srcCount, Activity dest[], vector<string>& prefs) {
+        int cnt = 0;
+        for(int i = 0; i < srcCount; i++) {
+            if(prefs.empty()) {
+                dest[cnt++] = src[i];
+            } else {
+                for(string p : prefs) {
+                    if(src[i].type == p) {
+                        dest[cnt++] = src[i];
                         break;
                     }
                 }
-            } else {
-                validActivities.push_back(act);
             }
         }
+        return cnt;
+    }
+    
+    // SELECT HOTEL (Greedy - First Fit)
+    Hotel selectHotel(int tier, int days, int totalBudget) {
+        int cnt = 0;
+        while(cnt < 3 && hotels[tier][cnt].name != "") cnt++;
+        sortHotels(hotels[tier], cnt);
         
-        
-        sort(validActivities.begin(), validActivities.end(), [](auto &a, auto &b){
-            float ratioA = a.cost == 0 ? 999 : a.rating / a.cost;
-            float ratioB = b.cost == 0 ? 999 : b.rating / b.cost;
-            return ratioA > ratioB;
-        });
-        
-        
-        vector<Activity> finalActs;
-        int actCost = 0;
-        for(auto &act : validActivities) {
-            if(actCost + act.cost <= activityBudget) {
-                finalActs.push_back(act);
-                actCost += act.cost;
+        for(int i = 0; i < cnt; i++) {
+            int essential = hotels[tier][i].price * days + 500 * days + 200 * days;
+            if(essential <= totalBudget) 
+                return hotels[tier][i];
+        }
+        return hotels[tier][cnt-1];
+    }
+    
+    // SELECT RESTAURANT (Best Rated)
+    Restaurant selectRestaurant(int tier) {
+        int cnt = 0;
+        while(cnt < 3 && restaurants[tier][cnt].name != "") cnt++;
+        sortRestaurants(restaurants[tier], cnt);
+        return restaurants[tier][0];
+    }
+    
+    // SELECT ACTIVITIES (Greedy - Best Value First)
+    int selectActivities(Activity avail[], int n, Activity selected[], int budget) {
+        sortActivities(avail, n);
+        int spent = 0, cnt = 0;
+        for(int i = 0; i < n; i++) {
+            if(spent + avail[i].cost <= budget) {
+                selected[cnt++] = avail[i];
+                spent += avail[i].cost;
             }
         }
+        return cnt;
+    }
+    
+    // MAIN PLANNING FUNCTION
+    void plan(int tier, int days, vector<string>& prefs) {
+        int total = budgetPerDay[tier] * days;
         
+        // Select essentials
+        Hotel hotel = selectHotel(tier, days, total);
+        int hotelCost = hotel.price * days;
         
-        cout << "\n============================================================\n";
-        cout << "     RISHIKESH BUDGET PLANNER - YOUR ITINERARY\n";
-        cout << "============================================================\n\n";
+        Restaurant rest = selectRestaurant(tier);
+        int foodCost = rest.price * 2 * days;
         
-        cout << "BUDGET SUMMARY\n";
-        string tierName[] = {"","Backpacker","Budget","Mid-Range","Premium","Luxury"};
-        cout << "   Tier: " << tierName[tier] << "\n";
-        cout << "   Days: " << days << "  |  Total Budget: Rs." << totalBudget << "\n\n";
+        int transport[] = {0, 50, 150, 300, 600, 1500};
+        int transportCost = transport[tier] * days;
         
-        cout << "ACCOMMODATION\n";
-        cout << "   " << selectedStay.name << " [Rating: " << selectedStay.rating << "/5]\n";
-        cout << "   Location: " << selectedStay.location << "  |  Rs." << selectedStay.cost << "/night\n";
-        cout << "   Total: Rs." << stayCost << "\n\n";
+        int activityBudget = total - (hotelCost + foodCost + transportCost);
         
-        cout << "FOOD RECOMMENDATIONS\n";
-        for(int i=0; i<min(3,(int)foods[tier].size()); i++) {
-            cout << "   " << foods[tier][i].name << " [Rating: " << foods[tier][i].rating << "/5]\n";
-            cout << "      Cuisine: " << foods[tier][i].cuisine << "  |  Rs." << foods[tier][i].cost << "/meal\n";
-        }
-        cout << "   Estimated food cost: Rs." << foodCost << "\n\n";
+        // Select activities
+        Activity filtered[20], selected[20];
+        int filteredCount = filterByPref(allActivities, activityCount, filtered, prefs);
+        int selectedCount = selectActivities(filtered, filteredCount, selected, activityBudget);
         
-        cout << "TRANSPORT\n";
-        cout << "   " << trans[tier].mode << "  |  Rs." << trans[tier].cost << "/day\n";
-        cout << "   Total: Rs." << transportCost << "\n\n";
+        // Calculate totals
+        int activityTotal = 0;
+        for(int i = 0; i < selectedCount; i++) activityTotal += selected[i].cost;
+        int totalSpent = hotelCost + foodCost + transportCost + activityTotal;
+        
+        // Display results
+        cout << "\n========================================\n";
+        cout << "       RISHIKESH TRIP PLANNER\n";
+        cout << "========================================\n\n";
+        
+        string tiers[] = {"", "Backpacker", "Budget", "Mid-Range", "Premium", "Luxury"};
+        cout << "BUDGET: " << tiers[tier] << " | " << days << " days | Rs." << total << "\n\n";
+        
+        cout << "PREFERENCES: ";
+        if(prefs.empty()) cout << "All";
+        else for(string p : prefs) cout << p << " ";
+        cout << "\n\n";
+        
+        cout << "HOTEL: " << hotel.name << " (" << hotel.rating << "/5)\n";
+        cout << "       Rs." << hotel.price << "/night | Total: Rs." << hotelCost << "\n\n";
+        
+        cout << "FOOD: " << rest.name << " (" << rest.rating << "/5)\n";
+        cout << "      Rs." << rest.price << "/meal | Total: Rs." << foodCost << "\n\n";
+        
+        cout << "TRANSPORT: Rs." << transportCost << "\n\n";
         
         cout << "ACTIVITIES (Budget: Rs." << activityBudget << ")\n";
-        if(finalActs.empty()) {
-            cout << "   No activities within remaining budget\n";
-            if(activityBudget > 0) cout << "   Try selecting cheaper accommodation or reducing days\n";
+        if(selectedCount == 0) {
+            cout << "   None within budget\n";
         } else {
-            for(auto &act : finalActs) {
-                cout << "   " << act.name << " [" << act.category << "] [Rating: " << act.rating << "/5]\n";
-                cout << "      Location: " << act.location << "  |  Rs." << act.cost;
-                if(act.cost == 0) cout << " (FREE)";
-                cout << "  |  " << act.hours << "hrs\n";
+            for(int i = 0; i < selectedCount; i++) {
+                cout << "   " << (i+1) << ". " << selected[i].name 
+                     << " [" << selected[i].type << "]\n";
+                cout << "      Rs." << selected[i].cost 
+                     << (selected[i].cost == 0 ? " (FREE)" : "") 
+                     << " | Rating: " << selected[i].rating << "/5\n";
             }
         }
         
-        int totalSpent = stayCost + foodCost + transportCost + actCost;
-        cout << "\nCOST BREAKDOWN\n";
-        cout << "   Accommodation: Rs." << stayCost << "\n";
-        cout << "   Food:          Rs." << foodCost << "\n";
-        cout << "   Transport:     Rs." << transportCost << "\n";
-        cout << "   Activities:    Rs." << actCost << "\n";
-        cout << "   --------------------\n";
-        cout << "   TOTAL:         Rs." << totalSpent << "\n";
-        cout << "   Remaining:     Rs." << (totalBudget - totalSpent) << "\n\n";
-        
-        cout << "EXPERT TIPS\n";
-        if(tier==1) cout << "   * Visit during monsoon (July-Aug) for 30%% off on rafting\n";
-        if(tier<=2) cout << "   * Free Ganga Aarti at Parmarth Niketan (6 PM daily)\n";
-        if(tier==3) cout << "   * Book combo packages for adventure activities\n";
-        if(tier>=4) cout << "   * Try private sunset boat ride on Ganges\n";
-        cout << "   * Best time for rafting: September-March\n";
-        cout << "   * Book accommodations at least 1 week in advance\n";
+        cout << "\nCOST BREAKDOWN:\n";
+        cout << "   Hotel:      Rs." << hotelCost << "\n";
+        cout << "   Food:       Rs." << foodCost << "\n";
+        cout << "   Transport:  Rs." << transportCost << "\n";
+        cout << "   Activities: Rs." << activityTotal << "\n";
+        cout << "   -------------------------\n";
+        cout << "   TOTAL:      Rs." << totalSpent << "\n";
+        cout << "   Remaining:  Rs." << (total - totalSpent) << "\n";
         
         if(activityBudget < 0) {
-            cout << "\nIMPORTANT: Your essentials cost exceeds budget!\n";
-            cout << "   * Consider reducing number of days\n";
-            cout << "   * Or choose a lower budget tier\n";
-            cout << "   * Or select cheaper accommodation\n";
-        } else if(activityBudget < 1000 && days > 3) {
-            cout << "\nTIP: Low activity budget. Consider:\n";
-            cout << "   * Reducing number of days\n";
-            cout << "   * Choosing cheaper accommodation\n";
-            cout << "   * Focusing on free activities\n";
+            cout << "\n  WARNING: Budget too low! Reduce days or choose lower tier.\n";
         }
         
-        cout << "\n============================================================\n";
-        cout << "     HAVE A WONDERFUL TRIP TO RISHIKESH!\n";
-        cout << "============================================================\n";
+        cout << "\n========================================\n";
+        cout << "         HAVE A GREAT TRIP!\n";
+        cout << "========================================\n";
     }
 };
 
+// MAIN FUNCTION
 int main() {
     RishikeshPlanner planner;
     int tier, days, choice;
     vector<string> prefs;
     
-    cout << "WELCOME TO PROJECTWISE - RISHIKESH TRAVEL PLANNER\n\n";
+    cout << "WELCOME TO RISHIKESH TRAVEL PLANNER\n\n";
     cout << "Budget Tiers:\n";
-    cout << "1. Backpacker  (Rs.1200/day) - Hostels, street food\n";
-    cout << "2. Budget      (Rs.2500/day) - Basic comfort\n";
-    cout << "3. Mid-Range   (Rs.4500/day) - Good hotels\n";
-    cout << "4. Premium     (Rs.8000/day) - Premium stays\n";
-    cout << "5. Luxury      (Rs.15000/day) - Luxury resorts\n";
-    cout << "Select tier (1-5): ";
+    cout << "1. Backpacker  (Rs.1200/day)\n";
+    cout << "2. Budget      (Rs.2500/day)\n";
+    cout << "3. Mid-Range   (Rs.4500/day)\n";
+    cout << "4. Premium     (Rs.8000/day)\n";
+    cout << "5. Luxury      (Rs.15000/day)\n";
+    cout << "Select tier: ";
     cin >> tier;
     
     cout << "Number of days: ";
     cin >> days;
     
-    cout << "\nPreferences :\n";
-    cout << "1. Adventure   2. Spiritual   3. Food   4. Nature\n";
-    cout << "Your choices (press 0 for all): ";
-    
-    prefs.clear();
-    while(cin >> choice) {
-        if(choice == 0) {
-            prefs.clear();
-            break;
-        }
-        if(choice==1) prefs.push_back("Adventure");
-        else if(choice==2) prefs.push_back("Spiritual");
-        else if(choice==3) prefs.push_back("Food");
-        else if(choice==4) prefs.push_back("Nature");
-        if(cin.get()=='\n') break;
+    cout << "\nPreferences (1.Adventure 2.Spiritual 3.Nature, 0 to finish):\n";
+    while(true) {
+        cout << "Choice: ";
+        cin >> choice;
+        if(choice == 0) break;
+        else if(choice == 1) prefs.push_back("Adventure"), cout << "   + Adventure\n";
+        else if(choice == 2) prefs.push_back("Spiritual"), cout << "   + Spiritual\n";
+        else if(choice == 3) prefs.push_back("Nature"), cout << "   + Nature\n";
+        else if(choice == 4) { prefs.clear(); cout << "   All activities\n"; break; }
     }
     
     planner.plan(tier, days, prefs);

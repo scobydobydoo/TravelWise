@@ -8,7 +8,7 @@ import os
 
 CATALOGUE = {
     "rafting_16km": {
-        "description": "River Rafting - 16 km (Shivpuri to Rishikesh)",
+        "description": "River Rafting - 16 km |Shivpuri to Rishikesh|",
         "base_price": 450,
         "weight_q": 80,   
         "weight_l": 60,   
@@ -16,7 +16,7 @@ CATALOGUE = {
         "tips": "Always insist on BIS-certified life jackets. Avoid touts near Ram Jhula bridge."
     },
     "rafting_36km": {
-        "description": "River Rafting - 36 km (Marine Drive to Rishikesh)",
+        "description": "River Rafting - 36 km |Marine Drive to Rishikesh|",
         "base_price": 900,
         "weight_q": 150,
         "weight_l": 80,
@@ -343,7 +343,6 @@ def show_result(item_name, fair_price, offered, status, deviation, msg, tips, ex
     hr()
 
 def _wrap_print(text, indent="  "):
-    """Wrap and print text within console WIDTH."""
     words = text.split()
     line = indent
     for w in words:
