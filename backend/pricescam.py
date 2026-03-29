@@ -1,10 +1,4 @@
 import os
-#   base_price  – INR floor price at quality=1, location=1, season=1
-#   weight_q    – Rs added per quality point (reflects certification premium)
-#   weight_l    – Rs added per location point (tourist-zone surcharge)
-#   weight_s    – Rs added per season point (demand-driven spike)
-#   description – readable label for display
-#   tips        – real consumer advice shown after prediction
 
 CATALOGUE = {
     "rafting_16km": {
@@ -42,9 +36,9 @@ CATALOGUE = {
     "yoga_class": {
         "description": "Yoga Class (1 session, ~90 min)",
         "base_price": 200,
-        "weight_q": 150,  # certified Iyengar/Sivananda teacher vs random
+        "weight_q": 150,  
         "weight_l": 100,
-        "weight_s": 180,  # International Yoga Festival (March) = 3x spike
+        "weight_s": 180,  
         "tips": "Yoga Festival (March) prices spike 3x. Monthly ashram packages are 60% cheaper per session."
     },
     "meditation_retreat": {
@@ -139,7 +133,7 @@ CATALOGUE = {
 }
 
 
-# SECTION 2 : LINEAR REGRESSION PRICE PREDICTOR
+# LINEAR REGRESSION PRICE 
 
 
 def predict_fair_price(category_key, quality, location, season):
@@ -203,11 +197,6 @@ def evaluate_offer(offered_price, fair_price):
     return status, deviation, msg
 
 
-# ──────────────────────────────────────────────────────────────────────────────
-# SECTION 3 : PRICE DRIVER EXPLANATION (Bonus feature)
-# Identifies which of the three factors contributes most to the price
-# and returns a human-readable explanation sentence.
-# ──────────────────────────────────────────────────────────────────────────────
 
 def price_explanation(quality, location, season, fair_price, category_key):
     """
@@ -238,7 +227,7 @@ def price_explanation(quality, location, season, fair_price, category_key):
     )
 
 
-WIDTH = 66  # console width for borders
+WIDTH = 66  
 
 def clear():
     """Clear terminal screen cross-platform."""
@@ -335,7 +324,6 @@ def show_result(item_name, fair_price, offered, status, deviation, msg, tips, ex
         print("  {}".format(line))
     hr("-")
     print("  INSIGHT:")
-    # Word-wrap the explanation
     _wrap_print(explanation, indent="    ")
     hr("-")
     print("  LOCAL TIP:")
@@ -407,7 +395,7 @@ def main():
             print("  Use option [2] in the main menu for the detailed guide.")
             print()
             quality  = get_int_input("  Quality Level    (1=basic   ... 5=premium) : ", 1, 5)
-            location = get_int_input("  Location Factor  (1=remote  ... 5=Tapovan) : ", 1, 5)
+            location = get_int_input("  Location Factor  (1=remote  ... 5=Main) : ", 1, 5)
             season   = get_int_input("  Season Factor    (1=offseason .. 5=peak)   : ", 1, 5)
 
             offered = get_float_input("\n  Vendor asking price (in Rs): ")
