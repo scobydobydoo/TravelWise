@@ -1,11 +1,9 @@
-
 #include <iostream>
 #include <vector>
 #include <string>
 #include <algorithm>
 using namespace std;
 
-// DATA STRUCTURES
 struct Hotel {
     string name;
     int price;
@@ -20,12 +18,12 @@ struct Restaurant {
 
 struct Activity {
     string name;
-    string type;      // Adventure, Spiritual, Nature
+    string type;      
     int cost;
     float rating;
 };
 
-// MAIN PLANNER CLASS
+
 class RishikeshPlanner {
 private:
     int budgetPerDay[6];
@@ -35,14 +33,13 @@ private:
     int activityCount;
     
 public:
-    // Constructor - Load all data
+
     RishikeshPlanner() {
-        // Set daily budgets for 5 tiers
+        
         budgetPerDay[1] = 1200;   budgetPerDay[2] = 2500;
         budgetPerDay[3] = 4500;   budgetPerDay[4] = 8000;
         budgetPerDay[5] = 15000;
         
-        // Hotels by tier
         hotels[1][0] = {"Zostel Rishikesh", 400, 4.2};
         hotels[1][1] = {"GoStops", 350, 4.0};
         hotels[1][2] = {"Shantiyoga Ashram", 500, 4.3};
@@ -60,7 +57,6 @@ public:
         
         hotels[5][0] = {"Ananda Himalayas", 25000, 4.9};
         
-        // Restaurants by tier
         restaurants[1][0] = {"Little Buddha Cafe", 250, 4.5};
         restaurants[1][1] = {"Freedom Cafe", 200, 4.3};
         restaurants[1][2] = {"Street Food", 80, 4.0};
@@ -78,7 +74,7 @@ public:
         
         restaurants[5][0] = {"Ananda Spa Restaurant", 2000, 4.9};
         
-        // Activities
+        
         activityCount = 0;
         allActivities[activityCount++] = {"Ganga Aarti", "Spiritual", 0, 4.9};
         allActivities[activityCount++] = {"Temple Tour", "Spiritual", 0, 4.7};
@@ -96,7 +92,6 @@ public:
         allActivities[activityCount++] = {"Kunjapuri Temple Trek", "Nature", 300, 4.4};
     }
     
-    // QUICK SORT FOR HOTELS
     int partitionHotels(Hotel arr[], int low, int high) {
         float pivot = arr[high].rating;
         int i = low - 1;
@@ -118,7 +113,6 @@ public:
         if(n > 1) quickSortHotels(arr, 0, n-1);
     }
     
-    // QUICK SORT FOR RESTAURANTS
     int partitionRestaurants(Restaurant arr[], int low, int high) {
         float pivot = arr[high].rating;
         int i = low - 1;
@@ -140,7 +134,6 @@ public:
         if(n > 1) quickSortRestaurants(arr, 0, n-1);
     }
     
-    // QUICK SORT FOR ACTIVITIES (by value/cost ratio)
     float activityValue(Activity a) {
         if(a.cost == 0) return 999;
         return a.rating / a.cost;
@@ -167,7 +160,7 @@ public:
         if(n > 1) quickSortActivities(arr, 0, n-1);
     }
     
-    // FILTER ACTIVITIES BY PREFERENCES
+
     int filterByPref(Activity src[], int srcCount, Activity dest[], vector<string>& prefs) {
         int cnt = 0;
         for(int i = 0; i < srcCount; i++) {
@@ -185,29 +178,32 @@ public:
         return cnt;
     }
     
-    // SELECT HOTEL (Greedy - First Fit)
-    Hotel selectHotel(int tier, int days, int totalBudget) {
-        int cnt = 0;
-        while(cnt < 3 && hotels[tier][cnt].name != "") cnt++;
-        sortHotels(hotels[tier], cnt);
-        
-        for(int i = 0; i < cnt; i++) {
-            int essential = hotels[tier][i].price * days + 500 * days + 200 * days;
-            if(essential <= totalBudget) 
-                return hotels[tier][i];
+    Hotel selectHotel(int tier, int days, int hotelBudget) {
+        for(int t = tier; t >= 1; t--) {
+            int cnt = 0;
+            while(cnt < 3 && hotels[t][cnt].name != "") cnt++;
+            sortHotels(hotels[t], cnt);
+            for(int i = 0; i < cnt; i++) {
+                if(hotels[t][i].price * days <= hotelBudget)
+                    return hotels[t][i];
+            }
         }
-        return hotels[tier][cnt-1];
+        return hotels[1][0];
+    }
+
+    Restaurant selectRestaurant(int tier, int foodBudgetPerMeal) {
+        for(int t = tier; t >= 1; t--) {
+            int cnt = 0;
+            while(cnt < 3 && restaurants[t][cnt].name != "") cnt++;
+            sortRestaurants(restaurants[t], cnt);
+            for(int i = 0; i < cnt; i++) {
+                if(restaurants[t][i].price <= foodBudgetPerMeal)
+                    return restaurants[t][i];
+            }
+        }
+        return restaurants[1][2];
     }
     
-    // SELECT RESTAURANT (Best Rated)
-    Restaurant selectRestaurant(int tier) {
-        int cnt = 0;
-        while(cnt < 3 && restaurants[tier][cnt].name != "") cnt++;
-        sortRestaurants(restaurants[tier], cnt);
-        return restaurants[tier][0];
-    }
-    
-    // SELECT ACTIVITIES (Greedy - Best Value First)
     int selectActivities(Activity avail[], int n, Activity selected[], int budget) {
         sortActivities(avail, n);
         int spent = 0, cnt = 0;
@@ -220,33 +216,33 @@ public:
         return cnt;
     }
     
-    // MAIN PLANNING FUNCTION
+
     void plan(int tier, int days, vector<string>& prefs) {
         int total = budgetPerDay[tier] * days;
         
-        // Select essentials
-        Hotel hotel = selectHotel(tier, days, total);
+        int hotelBudget     = (int)(total * 0.40);
+        int foodBudget      = (int)(total * 0.25);
+        int transportBudget = (int)(total * 0.10);
+        int activityBudget  = total - hotelBudget - foodBudget - transportBudget;
+
+        Hotel hotel = selectHotel(tier, days, hotelBudget);
         int hotelCost = hotel.price * days;
-        
-        Restaurant rest = selectRestaurant(tier);
-        int foodCost = rest.price * 2 * days;
-        
-        int transport[] = {0, 50, 150, 300, 600, 1500};
-        int transportCost = transport[tier] * days;
-        
-        int activityBudget = total - (hotelCost + foodCost + transportCost);
-        
-        // Select activities
+
+        int foodBudgetPerMeal = foodBudget / (2 * days);
+        Restaurant rest = selectRestaurant(tier, foodBudgetPerMeal);
+
+        int foodCost = min(rest.price * 2 * days, foodBudget);
+
+        int transportCost = transportBudget;
+
         Activity filtered[20], selected[20];
         int filteredCount = filterByPref(allActivities, activityCount, filtered, prefs);
         int selectedCount = selectActivities(filtered, filteredCount, selected, activityBudget);
-        
-        // Calculate totals
+      
         int activityTotal = 0;
         for(int i = 0; i < selectedCount; i++) activityTotal += selected[i].cost;
         int totalSpent = hotelCost + foodCost + transportCost + activityTotal;
         
-        // Display results
         cout << "\n========================================\n";
         cout << "       RISHIKESH TRIP PLANNER\n";
         cout << "========================================\n\n";
@@ -258,6 +254,12 @@ public:
         if(prefs.empty()) cout << "All";
         else for(string p : prefs) cout << p << " ";
         cout << "\n\n";
+
+        cout << "BUDGET ALLOCATION:\n";
+        cout << "   Hotel:      Rs." << hotelBudget     << " (40%)\n";
+        cout << "   Food:       Rs." << foodBudget      << " (25%)\n";
+        cout << "   Transport:  Rs." << transportBudget << " (10%)\n";
+        cout << "   Activities: Rs." << activityBudget  << " (25%)\n\n";
         
         cout << "HOTEL: " << hotel.name << " (" << hotel.rating << "/5)\n";
         cout << "       Rs." << hotel.price << "/night | Total: Rs." << hotelCost << "\n\n";
@@ -289,7 +291,7 @@ public:
         cout << "   TOTAL:      Rs." << totalSpent << "\n";
         cout << "   Remaining:  Rs." << (total - totalSpent) << "\n";
         
-        if(activityBudget < 0) {
+        if(totalSpent > total) {
             cout << "\n  WARNING: Budget too low! Reduce days or choose lower tier.\n";
         }
         
@@ -299,7 +301,6 @@ public:
     }
 };
 
-// MAIN FUNCTION
 int main() {
     RishikeshPlanner planner;
     int tier, days, choice;
