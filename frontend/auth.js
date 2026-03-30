@@ -22,7 +22,7 @@ function signup() {
 
         if (data.status === "success") {
             setTimeout(() => {
-                window.location.href = "login.html";
+                window.location.href = "index.html";
             }, 1000);
         }
     })
@@ -55,7 +55,7 @@ function login() {
             localStorage.setItem("user", username);
 
             setTimeout(() => {
-                window.location.href = "index.html"; 
+                window.location.href = "main.html"; 
             }, 800);
         } else {
             msg.innerText = " Invalid credentials";

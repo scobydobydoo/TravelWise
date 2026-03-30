@@ -1,44 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>TravelWise</title>
+    <title>Login</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="app-body">
+<body class="auth-body">
 
-<div class="app-container">
-    
-    <h1> TravelWise</h1>
-    <p>  Select your exploration</p>
+<div class="auth-container">
+    <h2>TravelWise</h2>
+    <p> Welcome  </p>
 
-    <div class="grid">
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
 
-    <div class="card" onclick="goCity()">
-        <h3>Rishikesh</h3>
-        <p>Explore the adventure capital of India</p>
-    </div>
+    <button onclick="login()">Login</button>
 
-    <div class="card disabled">
-        <h3>More Cities</h3>
-        <p>Coming Soon</p>
-    </div>
+    <p id="msg"></p>
 
+    <a href="signup.html">New here? Signup</a>
 </div>
 
-    </div>
-
-</div>
-
-<script>
-function goCity() {
-    window.location.href = "city.html";
-}
-</script>
-<script>
-function goBudget() {
-    window.location.href = "budget.html";
-}
-</script>
+<script src="auth.js"></script>
 
 </body>
 </html>
