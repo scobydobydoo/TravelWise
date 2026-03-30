@@ -45,7 +45,6 @@ try:
                 pass
 
         highway = data.get("highway", "")
-
         if isinstance(highway, list):
             highway = highway[0]
 
@@ -76,13 +75,13 @@ try:
     for u, v, data in G.edges(data=True):
         length = data.get("length", 1)
         speed = get_speed(data)
-
         time = length / (speed * 1000 / 3600)
 
         edges.append({
             "from": int(u),
             "to": int(v),
-            "weight": time
+            "weight": time,
+            "length": length
         })
 
     graph_data = {
@@ -95,7 +94,7 @@ try:
     with open("graph.json", "w") as f:
         json.dump(graph_data, f, indent=4)
 
-    print("Graph saved (fastest route enabled)")
+    print("Graph saved")
 
 except Exception as e:
     print("ERROR:", str(e))

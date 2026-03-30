@@ -6,12 +6,10 @@ using json = nlohmann::json;
 
 typedef pair<double, long long> pii;
 
-unordered_map<long long, vector<pair<long long, double>>> adj;
+unordered_map<long long, vector<tuple<long long, double, double>>> adj;
 
-vector<long long> dijkstra(long long src, long long dest) {
-    unordered_map<long long, double> dist;
+vector<long long> dijkstra(long long src, long long dest, unordered_map<long long, double> &dist) {
     unordered_map<long long, long long> parent;
-
     priority_queue<pii, vector<pii>, greater<pii>> pq;
 
     pq.push({0, src});
@@ -27,11 +25,11 @@ vector<long long> dijkstra(long long src, long long dest) {
         if (u == dest) break;
 
         for (auto &edge : adj[u]) {
-            long long v = edge.first;
-            double w = edge.second;
+            long long v = get<0>(edge);
+            double time = get<1>(edge);
 
-            if (!dist.count(v) || dist[v] > d + w) {
-                dist[v] = d + w;
+            if (!dist.count(v) || dist[v] > d + time) {
+                dist[v] = d + time;
                 parent[v] = u;
                 pq.push({dist[v], v});
             }
@@ -63,9 +61,7 @@ int main() {
     getline(cin, destination);
 
     string command = "python fetch_graph.py \"" + source + "\" \"" + destination + "\"";
-    int result = system(command.c_str());
-
-    if (result != 0) {
+    if (system(command.c_str()) != 0) {
         cout << "Python script failed!\n";
         return 1;
     }
@@ -73,7 +69,7 @@ int main() {
     ifstream file("graph.json");
 
     if (!file.is_open() || file.peek() == ifstream::traits_type::eof()) {
-        cout << "Error: graph.json is empty or not created!\n";
+        cout << "Error: graph.json is empty!\n";
         return 1;
     }
 
@@ -86,14 +82,16 @@ int main() {
     for (auto &edge : data["edges"]) {
         long long u = edge["from"];
         long long v = edge["to"];
-        double w = edge["weight"];
+        double time = edge["weight"];
+        double distance = edge["length"];
 
-        adj[u].push_back({v, w});
+        adj[u].push_back({v, time, distance});
     }
 
-    cout << "\nComputing Route...\n";
+    cout << "\nComputing fastest route...\n";
 
-    vector<long long> path = dijkstra(source_node, destination_node);
+    unordered_map<long long, double> dist;
+    vector<long long> path = dijkstra(source_node, destination_node, dist);
 
     if (path.empty()) {
         cout << "No route found!\n";
@@ -104,20 +102,30 @@ int main() {
     for (auto node : path) cout << node << " ";
     cout << "\n";
 
-    ofstream out("route.txt");
-    for (auto node : path) {
-        out << node << " ";
+    double total_distance = 0;
+
+    for (int i = 0; i < path.size() - 1; i++) {
+        long long u = path[i];
+        long long v = path[i + 1];
+
+        for (auto &edge : adj[u]) {
+            if (get<0>(edge) == v) {
+                total_distance += get<2>(edge);
+                break;
+            }
+        }
     }
+
+    double total_time = dist[destination_node];
+
+    cout << "\nTotal Distance: " << total_distance / 1000.0 << " km\n";
+    cout << "Estimated Time: " << total_time / 60.0 << " minutes\n";
+
+    ofstream out("route.txt");
+    for (auto node : path) out << node << " ";
     out.close();
 
-    cout << "\nGenerating map...\n";
-
-    int map_result = system("python show_map.py");
-
-    if (map_result != 0) {
-        cout << "Failed to generate map!\n";
-        return 1;
-    }
+    system("python show_map.py");
 
     cout << "\nMap generated\n";
     system("start map.html");
