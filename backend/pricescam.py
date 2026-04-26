@@ -7,7 +7,7 @@ CATALOGUE = {
         "weight_q": 80,   
         "weight_l": 60,   
         "weight_s": 120,  
-        "tips": "Always insist on BIS-certified life jackets. Avoid touts near Ram Jhula bridge."
+        "tips": "Always insist on BIS-certified life jackets."
     },
     "rafting_36km": {
         "description": "River Rafting - 36 km |Marine Drive to Rishikesh|",
@@ -15,7 +15,7 @@ CATALOGUE = {
         "weight_q": 150,
         "weight_l": 80,
         "weight_s": 200,
-        "tips": "Book via registered GMVN or certified operators. Groups of 6+ typically get 20% off."
+        "tips": "Groups of 6+ typically get 20% off."
     },
     "bungee_jumping": {
         "description": "Bungee Jumping (Jumpin Heights, Mohan Chatti - 83m)",
@@ -23,10 +23,10 @@ CATALOGUE = {
         "weight_q": 300,  
         "weight_l": 200,
         "weight_s": 350,
-        "tips": "Only ONE certified bungee site exists near Rishikesh (Jumpin Heights). Beware all other 'bungee' offers."
+        "tips": "Check for certified bungee site only."
     },
     "flying_fox": {
-        "description": "Flying Fox / Zipline",
+        "description": "Zipline",
         "base_price": 800,
         "weight_q": 120,
         "weight_l": 100,
@@ -47,7 +47,7 @@ CATALOGUE = {
         "weight_q": 200,
         "weight_l": 120,
         "weight_s": 150,
-        "tips": "Parmarth Niketan offers FREE evening Ganga Aarti and meditation. Do not pay touts for this."
+        "tips": "Parmarth Niketan offers FREE evening Ganga Aarti and meditation."
     },
     "ayurvedic_massage": {
         "description": "Ayurvedic Massage / Spa (60 min full body)",
@@ -55,7 +55,7 @@ CATALOGUE = {
         "weight_q": 200,  
         "weight_l": 150,
         "weight_s": 100,
-        "tips": "Ask for a BAMS-qualified Ayurvedic therapist certificate. Avoid ghat-side massage offers from strangers."
+        "tips": " Avoid ghat-side massage offers from strangers."
     },
     "rudraksha_beads": {
         "description": "Rudraksha Mala / Beads (108-bead standard)",
@@ -71,7 +71,7 @@ CATALOGUE = {
         "weight_q": 180,
         "weight_l": 70,
         "weight_s": 30,
-        "tips": "First quoted price near Ram Jhula market is typically 3x fair price. Bargain firmly and walk away once."
+        "tips": "First quoted price is typically false try to bargain."
     },
     "hippie_clothes": {
         "description": "Hippie / Bohemian Wear (kurta, harem pants)",
@@ -79,7 +79,7 @@ CATALOGUE = {
         "weight_q": 100,
         "weight_l": 80,
         "weight_s": 50,
-        "tips": "Tapovan boutiques charge 2x for the same stock found at Laxman Jhula side-lane shops."
+        "tips": "Tapovan shops charge 2x for the same stock found at Laxman Jhula side-lane shops."
     },
     "cotton_clothes": {
         "description": "Plain Cotton Clothes (local weave, t-shirt / shirt)",
@@ -96,7 +96,7 @@ CATALOGUE = {
         "weight_q": 120,
         "weight_l": 150,  
         "weight_s": 80,
-        "tips": "Little Buddha Cafe is iconic but overpriced. Equally good meals 200m off the main lane at half the cost."
+        "tips": "Equally good meals 200m off the main lane at half the cost."
     },
     "israeli_food": {
         "description": "Israeli / Continental Restaurant (per person)",
@@ -104,7 +104,7 @@ CATALOGUE = {
         "weight_q": 130,
         "weight_l": 160,
         "weight_s": 90,
-        "tips": "Many Israeli cafes cluster near Laxman Jhula. Shakshouka and hummus quality varies - read recent reviews."
+        "tips": "Many Israeli cafes cluster near Laxman Jhula. "
     },
     "local_thali": {
         "description": "Local Vegetarian Thali (full meal)",
@@ -112,7 +112,7 @@ CATALOGUE = {
         "weight_q": 50,
         "weight_l": 80,   
         "weight_s": 30,
-        "tips": "Rs 80-120 thali near Triveni Ghat is wholesome and filling. Same dish costs Rs 250+ near bungee camps."
+        "tips": "Rs 80-120 thali near Triveni Ghat is wholesome, Same dish costs Rs 250+ near bungee camps."
     },
     "taxi_local": {
         "description": "Taxi / Cab (local, up to 10 km within Rishikesh)",
@@ -199,10 +199,7 @@ def evaluate_offer(offered_price, fair_price):
 
 
 def price_explanation(quality, location, season, fair_price, category_key):
-    """
-    Determine the biggest price driver and explain it in plain language.
-    Compares three contribution amounts: quality, location, season.
-    """
+ 
     item = CATALOGUE[category_key]
     contrib_q = item["weight_q"] * quality
     contrib_l = item["weight_l"] * location

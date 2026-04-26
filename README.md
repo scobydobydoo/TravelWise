@@ -114,17 +114,24 @@ ProjectWise provides features such as:
 ## 📁 Project Structure
 
 ```bash
-projectwise/
-│── data/                  
-│── algorithms/
-│   ├── graph/
-│   ├── dp/
-│   ├── greedy/
-│── ml/
-│   ├── regression/
-│   ├── classification/
-│── core/                 
-│── utils/                
-│── main.py                
+projectwise/                
+│── Backend/
+│   ├── CPP/
+│   │   ├── fetch_graph.py/
+│   │   ├── main.cpp/
+│   │   ├── fshow_map.py/
+│   ├── db.py/
+│   ├── app.py/
+│   ├── planner.cpp/
+│   ├── pricescam.py/
+│   ├── users.db/
+│── Frontend/
+│   ├── index.html/
+│   ├── main.html/
+│   ├── city.html/               
+│   ├── budget.html/
+│   ├── style.css/
+│   ├── auth.js/
+│   ├── script.js/                              
 │── requirements.txt
 │── README.md
