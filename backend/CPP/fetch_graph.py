@@ -7,16 +7,14 @@ try:
     destination_name = sys.argv[2]
 
     print("Loading Rishikesh map...")
-
     G = ox.graph_from_place("Rishikesh, Uttarakhand, India", network_type='drive')
-
     print("Graph loaded")
 
     def get_point(place):
         try:
             return ox.geocode(place + ", Rishikesh, India")
         except:
-            print(f"Geocoding failed for {place}, using fallback")
+            print(f"⚠️ Geocoding failed for {place}, using fallback")
             return None
 
     source_point = get_point(source_name)
@@ -26,7 +24,6 @@ try:
 
     if source_point is None:
         source_point = (nodes_list[0][1]["y"], nodes_list[0][1]["x"])
-
     if destination_point is None:
         destination_point = (nodes_list[-1][1]["y"], nodes_list[-1][1]["x"])
 
@@ -75,7 +72,8 @@ try:
     for u, v, data in G.edges(data=True):
         length = data.get("length", 1)
         speed = get_speed(data)
-        time = length / (speed * 1000 / 3600)
+
+        time = length / (speed * 1000 / 3600)  # seconds
 
         edges.append({
             "from": int(u),
