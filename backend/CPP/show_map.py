@@ -18,4 +18,4 @@ folium.Marker(route_coords[-1], popup="End", icon=folium.Icon(color='red')).add_
 
 m.save("map.html")
 
-print("Map saved as map.html")
+print("Map saved")
