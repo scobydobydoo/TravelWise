@@ -1,6 +1,5 @@
 const BASE_URL = "http://127.0.0.1:5000";
 
-
 function signup() {
     let username = document.getElementById("username").value.trim();
     let password = document.getElementById("password").value.trim();

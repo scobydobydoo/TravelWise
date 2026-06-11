@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Risk Analysis — TravelWise</title>
+    <link rel="stylesheet" href="modules.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            min-height: 100vh;
+            background: #0d1117;
+            color: #e6edf3;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            padding: 2rem 1rem 4rem;
+        }
+
+        .wrap {
+            max-width: 860px;
+            margin: 0 auto;
+        }
+
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .page-header h1 { font-size: 2rem; font-weight: 800; letter-spacing: -.5px; }
+        .page-header p  { opacity: .6; margin-top: .4rem; font-size: .95rem; }
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 1.2rem;
+            color: #4f9dff;
+            text-decoration: none;
+            font-size: .9rem;
+            opacity: .8;
+            transition: opacity .15s;
+        }
+        .back-btn:hover { opacity: 1; }
+
+        .search-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+        .input-row {
+            display: flex;
+            gap: .75rem;
+            align-items: center;
+        }
+        .input-row input {
+            flex: 1;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 10px;
+            padding: .75rem 1rem;
+            color: #e6edf3;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color .2s;
+        }
+        .input-row input:focus { border-color: #4f9dff; }
+        .input-row input::placeholder { opacity: .45; }
+
+        .btn-analyse {
+            background: linear-gradient(135deg, #4f9dff, #7b5ef8);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: .75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: opacity .2s, transform .15s;
+        }
+        .btn-analyse:hover   { opacity: .88; transform: translateY(-1px); }
+        .btn-analyse:active  { transform: translateY(0); }
+        .btn-analyse:disabled { opacity: .4; cursor: not-allowed; }
+
+        .suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+            margin-top: 1rem;
+        }
+        .chip {
+            background: rgba(79,157,255,.12);
+            border: 1px solid rgba(79,157,255,.25);
+            border-radius: 20px;
+            padding: .3rem .85rem;
+            font-size: .8rem;
+            color: #4f9dff;
+            cursor: pointer;
+            transition: background .15s;
+        }
+        .chip:hover { background: rgba(79,157,255,.25); }
+
+        .loader { text-align: center; padding: 2.5rem; }
+        .spinner {
+            width: 44px; height: 44px;
+            border: 4px solid rgba(255,255,255,.1);
+            border-top-color: #4f9dff;
+            border-radius: 50%;
+            animation: spin .75s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loader p { opacity: .6; font-size: .9rem; }
+
+        .error-box {
+            background: rgba(255,60,60,.1);
+            border: 1px solid rgba(255,60,60,.3);
+            border-radius: 10px;
+            padding: .85rem 1rem;
+            color: #ff8080;
+            font-size: .9rem;
+            margin-bottom: 1rem;
+        }
+
+        .risk-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 1.75rem;
+            margin-bottom: 1.25rem;
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .score-ring {
+            flex-shrink: 0;
+            width: 100px;
+            height: 100px;
+            position: relative;
+        }
+        .score-ring svg { transform: rotate(-90deg); }
+        .score-ring .ring-bg  { fill: none; stroke: rgba(255,255,255,.08); stroke-width: 8; }
+        .score-ring .ring-fill {
+            fill: none;
+            stroke-width: 8;
+            stroke-linecap: round;
+            transition: stroke-dashoffset .8s cubic-bezier(.4,0,.2,1), stroke .4s;
+        }
+        .score-center {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .score-num   { font-size: 1.6rem; font-weight: 800; line-height: 1; }
+        .score-denom { font-size: .7rem; opacity: .5; }
+
+        .risk-details { flex: 1; min-width: 200px; }
+        .risk-place   { font-size: 1.3rem; font-weight: 700; margin-bottom: .3rem; }
+        .risk-level   { font-size: 1rem; font-weight: 700; margin-bottom: .75rem; }
+        .risk-factors { list-style: none; }
+        .risk-factors li {
+            font-size: .875rem;
+            opacity: .75;
+            padding: .2rem 0;
+        }
+        .risk-factors li::before { content: "⚠ "; }
+
+        .risk-coords  { font-size: .75rem; opacity: .4; margin-top: .6rem; font-family: monospace; }
+
+]
+        .map-wrap {
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,.1);
+            box-shadow: 0 4px 24px rgba(0,0,0,.3);
+        }
+        #risk-frame {
+            width: 100%;
+            height: 480px;
+            border: none;
+            display: block;
+        }
+
+        .legend-strip {
+            display: flex;
+            gap: .5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+            font-size: .78rem;
+            opacity: .7;
+        }
+        .legend-strip span { display: flex; align-items: center; gap: .3rem; }
+        .dot {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+<div class="wrap">
+
+    <a href="city.html" class="back-btn">← Back</a>
+
+    <div class="page-header">
+        <h1>Safety Risk Analysis</h1>
+        <p>Search any place in Rishikesh to see its safety heatmap and risk score</p>
+    </div>
+
+    <!-- Search -->
+    <div class="search-card">
+        <div class="input-row">
+            <input type="text" id="place-input"
+                   placeholder="e.g. Laxman Jhula, Triveni Ghat, Tapovan…"
+                   onkeydown="if(event.key==='Enter') analyse()">
+            <button type="button" class="btn-analyse" id="analyse-btn" onclick="analyse()">
+                Analyse Risk 
+            </button>
+        </div>
+        <div class="suggestions">
+            <span class="chip" onclick="setPlace('Laxman Jhula')">Laxman Jhula</span>
+            <span class="chip" onclick="setPlace('Ram Jhula')">Ram Jhula</span>
+            <span class="chip" onclick="setPlace('Triveni Ghat')">Triveni Ghat</span>
+            <span class="chip" onclick="setPlace('Tapovan')">Tapovan</span>
+            <span class="chip" onclick="setPlace('AIIMS Rishikesh')">AIIMS Rishikesh</span>
+            <span class="chip" onclick="setPlace('Parmarth Niketan')">Parmarth Niketan</span>
+            <span class="chip" onclick="setPlace('Beatles Ashram')">Beatles Ashram</span>
+            <span class="chip" onclick="setPlace('Neer Waterfall')">Neer Waterfall</span>
+        </div>
+    </div>
+
+
+    <div id="error-box" class="error-box hidden"></div>
+
+
+    <div id="loader" class="loader hidden">
+        <div class="spinner"></div>
+        <p>Geocoding location &amp; computing risk…</p>
+    </div>
+
+
+    <div id="result" class="hidden">
+
+        <div class="risk-card">
+            <div class="score-ring">
+                <svg viewBox="0 0 100 100" width="100" height="100">
+                    <circle class="ring-bg"   cx="50" cy="50" r="42"/>
+                    <circle class="ring-fill" cx="50" cy="50" r="42"
+                            id="ring-arc"
+                            stroke-dasharray="263.9"
+                            stroke-dashoffset="263.9"/>
+                </svg>
+                <div class="score-center">
+                    <span class="score-num"  id="score-num">—</span>
+                    <span class="score-denom">/10</span>
+                </div>
+            </div>
+            <div class="risk-details">
+                <div class="risk-place"  id="risk-place">—</div>
+                <div class="risk-level"  id="risk-level">—</div>
+                <ul  class="risk-factors" id="risk-factors"></ul>
+                <div class="risk-coords" id="risk-coords"></div>
+            </div>
+        </div>
+
+        <div class="legend-strip">
+            <strong>Heatmap key:</strong>
+            <span><span class="dot" style="background:#3cf"></span>Low</span>
+            <span><span class="dot" style="background:#8f8"></span>Moderate</span>
+            <span><span class="dot" style="background:#ff0"></span>Elevated</span>
+            <span><span class="dot" style="background:#f80"></span>High</span>
+            <span><span class="dot" style="background:#f33"></span>Very high</span>
+        </div>
+
+        <div class="map-wrap">
+            <iframe id="risk-frame"
+                    sandbox="allow-scripts allow-same-origin"
+                    title="Risk heatmap"></iframe>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+const API = "http://127.0.0.1:5000";
+
+const LEVEL_COLORS = { "SAFE": "#22c55e", "MODERATE": "#f59e0b", "HIGH RISK": "#ef4444" };
+const RING_CIRC    = 263.9;   // 2 * π * 42
+
+function setPlace(name) {
+    document.getElementById("place-input").value = name;
+    analyse();
+}
+
+function setLoading(on) {
+    document.getElementById("loader").classList.toggle("hidden", !on);
+    document.getElementById("analyse-btn").disabled = on;
+}
+
+function showError(msg) {
+    const el = document.getElementById("error-box");
+    el.textContent = "⚠ " + msg;
+    el.classList.remove("hidden");
+}
+function hideError() { document.getElementById("error-box").classList.add("hidden"); }
+
+async function analyse() {
+    const place = document.getElementById("place-input").value.trim();
+    if (!place) { showError("Enter a place name."); return; }
+
+    hideError();
+    setLoading(true);
+    document.getElementById("result").classList.add("hidden");
+
+    try {
+        const res  = await fetch(API + "/risk", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ place })
+        });
+        const json = await res.json();
+        console.log("Risk response:", json);
+
+        if (json.status !== "success") throw new Error(json.message || "Server error");
+
+        renderResult(json.data);
+
+    } catch(e) {
+        showError(e.message);
+        console.error(e);
+    } finally {
+        setLoading(false);
+    }
+}
+
+function renderResult(d) {
+
+    const pct    = d.score / 10;
+    const offset = RING_CIRC * (1 - pct);
+    const arc    = document.getElementById("ring-arc");
+    const color  = LEVEL_COLORS[d.level] || "#4f9dff";
+
+    arc.style.stroke          = color;
+    arc.style.strokeDashoffset = offset;
+
+    document.getElementById("score-num").textContent  = d.score;
+    document.getElementById("score-num").style.color  = color;
+
+
+    document.getElementById("risk-place").textContent = d.place;
+
+    const lvlEl = document.getElementById("risk-level");
+    lvlEl.textContent  = d.level;
+    lvlEl.style.color  = color;
+
+    const ul = document.getElementById("risk-factors");
+    ul.innerHTML = d.factors.map(function(f) {
+        return "<li>" + f + "</li>";
+    }).join("");
+
+    document.getElementById("risk-coords").textContent =
+        "📍 " + d.lat.toFixed(5) + ", " + d.lon.toFixed(5);
+
+    const frame = document.getElementById("risk-frame");
+    frame.removeAttribute("srcdoc");
+    setTimeout(function() {
+        frame.srcdoc = d.map_html || "<p style='padding:1rem;color:#888'>Map unavailable</p>";
+    }, 50);
+
+    document.getElementById("result").classList.remove("hidden");
+    document.getElementById("result").scrollIntoView({ behavior: "smooth" });
+}
+</script>
+</body>
+</html>

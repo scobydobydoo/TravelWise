@@ -1,49 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Budget Planner — TravelWise</title>
+    <link rel="stylesheet" href="modules.css">
+    <link rel="stylesheet" href="budget.css">
+</head>
+<body class="plan-body">
+
+<div class="plan-wrap">
+
+    <header class="plan-header">
+        <a href="city.html" class="back-btn">← Back</a>
+        <h1>Smart Budgeting</h1>
+        <p>trip planner for Rishikesh</p>
+    </header>
+
+    <!-- FORM -->
+    <section class="plan-form card-glass">
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Budget Tier</label>
+                <select id="tier">
+                    <option value="">Select tier</option>
+                    <option value="1"> Backpacker — ₹1,200/day</option>
+                    <option value="2"> Budget — ₹2,500/day</option>
+                    <option value="3"> Mid-Range — ₹4,500/day</option>
+                    <option value="4"> Premium — ₹8,000/day</option>
+                    <option value="5"> Luxury — ₹15,000/day</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Number of Days</label>
+                <input type="number" id="days" min="1" max="30" placeholder="e.g. 3">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Preferences <span class="hint">(optional, pick multiple)</span></label>
+            <div class="pref-group">
+                <label class="pref-chip">
+                    <input type="checkbox" name="pref" value="Adventure"> 🏄 Adventure
+                </label>
+                <label class="pref-chip">
+                    <input type="checkbox" name="pref" value="Spiritual"> 🕉️ Spiritual
+                </label>
+                <label class="pref-chip">
+                    <input type="checkbox" name="pref" value="Nature"> 🌿 Nature
+                </label>
+            </div>
+        </div>
+
+        <button id="gen-btn" onclick="getPlan()">Generate My Plan 🚀</button>
+    </section>
+
+    <!-- LOADER -->
+    <div id="loader" class="loader hidden">
+        <div class="spinner"></div>
+        <p>Crafting your perfect trip...</p>
+    </div>
+
+    <!-- ERROR -->
+    <div id="error-box" class="error-box hidden"></div>
+
+    <!-- RESULTS -->
+    <section id="result-section" class="hidden">
+
+        <!-- Summary bar -->
+        <div class="summary-bar">
+            <div class="sum-item">
+                <span id="res-tier" class="sum-big"></span>
+                <span class="sum-label">Tier</span>
+            </div>
+            <div class="sum-item">
+                <span id="res-days" class="sum-big"></span>
+                <span class="sum-label">Days</span>
+            </div>
+            <div class="sum-item">
+                <span id="res-total" class="sum-big"></span>
+                <span class="sum-label">Total Budget</span>
+            </div>
+            <div class="sum-item">
+                <span id="res-remaining" class="sum-big"></span>
+                <span class="sum-label">Remaining</span>
+            </div>
+        </div>
+
+        <!-- Budget breakdown chart -->
+        <div class="result-grid">
+
+            <div class="res-card">
+                <h3> Budget Allocation</h3>
+                <div id="budget-bars"></div>
+            </div>
+
+            <div class="res-card">
+                <h3> Hotel</h3>
+                <div id="hotel-info"></div>
+            </div>
+
+            <div class="res-card">
+                <h3> Food</h3>
+                <div id="food-info"></div>
+            </div>
+
+            <div class="res-card full-width">
+                <h3> Activities</h3>
+                <div id="activities-list"></div>
+            </div>
+
+        </div>
+
+        <!-- Over-budget warning -->
+        <div id="over-budget-warn" class="warn-box hidden">
+             Budget exceeded! Consider reducing days or choosing a lower tier.
+        </div>
+
+    </section>
+
+</div>
+
 <script>
+const API = "http://127.0.0.1:5000";
+
 async function getPlan() {
-    let tier = document.getElementById("tier").value;
-    let days = document.getElementById("days").value;
+    const tier = document.getElementById("tier").value;
+    const days = document.getElementById("days").value;
 
-
-    if (!tier || !days) {
-        alert("Please enter all fields");
+    if (!tier || !days || days < 1) {
+        showError("Please select a tier and enter valid number of days.");
         return;
     }
 
-    let prefs = [];
-    document.querySelectorAll("input[name='pref']:checked")
-        .forEach(el => prefs.push(el.value));
+    const prefs = [...document.querySelectorAll("input[name='pref']:checked")]
+        .map(el => el.value);
 
-    document.getElementById("result").innerText = "Generating your plan... ⏳";
+    setLoading(true);
+    hideError();
+    document.getElementById("result-section").classList.add("hidden");
 
     try {
-        let response = await fetch("http://127.0.0.1:5000/plan", {
+        const res = await fetch(`${API}/plan`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                tier: tier,
-                days: days,
-                prefs: prefs
-            })
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ tier: +tier, days: +days, prefs })
         });
+        const json = await res.json();
 
-        let data = await response.json();
+        if (json.status !== "success") throw new Error(json.message);
+        renderPlan(json.data);
 
-        if (data.status === "success") {
-            document.getElementById("result").innerText = data.output;
-        } else {
-            document.getElementById("result").innerText = "Error: " + data.message;
-        }
-
-    } catch (error) {
-        document.getElementById("result").innerText = "Server error ⚠️";
-        console.error(error);
+    } catch(err) {
+        showError("Server error: " + err.message);
+    } finally {
+        setLoading(false);
     }
 }
-</script>
-<button onclick="getPlan()" style="padding:10px 20px; border-radius:8px; cursor:pointer;">
-    Generate Plan 🚀
-</button>
 
-<pre id="result" style="margin-top:20px; background:#f5f5f5; padding:15px; border-radius:10px;"></pre>
+function renderPlan(d) {
+    // Summary bar
+    document.getElementById("res-tier").textContent      = d.tier;
+    document.getElementById("res-days").textContent      = d.days + " days";
+    document.getElementById("res-total").textContent     = "₹" + fmt(d.budget.total);
+    document.getElementById("res-remaining").textContent = "₹" + fmt(d.summary.remaining);
+
+    // Budget bars
+    const bars = [
+        { label: "Hotel",      amt: d.budget.hotel,      pct: 40, icon: "🏨" },
+        { label: "Food",       amt: d.budget.food,       pct: 25, icon: "🍽️" },
+        { label: "Transport",  amt: d.budget.transport,  pct: 10, icon: "🚌" },
+        { label: "Activities", amt: d.budget.activities, pct: 25, icon: "🎯" },
+    ];
+    document.getElementById("budget-bars").innerHTML = bars.map(b => `
+        <div class="bar-row">
+            <span class="bar-label">${b.icon} ${b.label}</span>
+            <div class="bar-track">
+                <div class="bar-fill" style="width:${b.pct}%"></div>
+            </div>
+            <span class="bar-amt">₹${fmt(b.amt)} (${b.pct}%)</span>
+        </div>
+    `).join("");
+
+    // Hotel
+    document.getElementById("hotel-info").innerHTML = `
+        <div class="info-name">${d.hotel.name}</div>
+        <div class="info-row">⭐ ${d.hotel.rating}/5</div>
+        <div class="info-row">₹${fmt(d.hotel.price_per_night)}/night</div>
+        <div class="info-total">Total: ₹${fmt(d.hotel.total_cost)}</div>
+    `;
+
+    // Restaurant
+    document.getElementById("food-info").innerHTML = `
+        <div class="info-name">${d.restaurant.name}</div>
+        <div class="info-row">⭐ ${d.restaurant.rating}/5</div>
+        <div class="info-row">₹${fmt(d.restaurant.price_per_meal)}/meal × 2 meals/day</div>
+        <div class="info-total">Total: ₹${fmt(d.restaurant.total_cost)}</div>
+    `;
+
+    // Activities
+    const actHTML = d.activities.length ? d.activities.map((a, i) => `
+        <div class="act-row">
+            <span class="act-num">${i+1}</span>
+            <div class="act-info">
+                <strong>${a.name}</strong>
+                <span class="act-type">${a.type}</span>
+            </div>
+            <div class="act-right">
+                <span class="act-cost">${a.free ? "FREE" : "₹" + fmt(a.cost)}</span>
+                <span class="act-rating">⭐ ${a.rating}</span>
+            </div>
+        </div>
+    `).join("") : `<p class="no-act">No activities within remaining budget.</p>`;
+    document.getElementById("activities-list").innerHTML = actHTML;
+
+    // Over budget
+    document.getElementById("over-budget-warn").classList.toggle("hidden", !d.summary.over_budget);
+
+    document.getElementById("result-section").classList.remove("hidden");
+    document.getElementById("result-section").scrollIntoView({ behavior: "smooth" });
+}
+
+function fmt(n) { return Math.round(n).toLocaleString("en-IN"); }
+function setLoading(on) {
+    document.getElementById("loader").classList.toggle("hidden", !on);
+    document.getElementById("gen-btn").disabled = on;
+}
+function showError(msg) { 
+    const el = document.getElementById("error-box");
+    el.textContent = msg;
+    el.classList.remove("hidden");
+}
+function hideError() { document.getElementById("error-box").classList.add("hidden"); }
+</script>
+</body>
+</html>

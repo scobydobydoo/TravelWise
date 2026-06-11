@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Rishikesh</title>
+    <meta charset="UTF-8">
+    <title>Rishikesh — TravelWise</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="appcity-body">
@@ -9,53 +10,43 @@
 <div class="appcity-container">
 
     <h2> Rishikesh</h2>
-    <p>  Select what you want to explore</p>
+    <p>Select what you want to explore</p>
 
     <div class="grid">
 
-        <div class="card" onclick="goBudget()">
+        <div class="card" onclick="window.location.href='budget.html'">
             <h3> Smart Budgeting</h3>
-            <p> Budget like a pro</p>
+            <p>Plan your trip effectively</p>
         </div>
 
-        <div class="card" onclick="goPrice()">
-            <h3> Price Estimator</h3>
-            <p> No more price scams! </p>
+        <div class="card" onclick="window.location.href='price.html'">
+            <h3> Price Scam Detector</h3>
+            <p>Know the fair price before you pay</p>
         </div>
 
-        <div class="card" onclick="goRoute()">
-            <h3> Transport Guide </h3>
-            <p> Explore with savings </p>
+        <div class="card" onclick="window.location.href='route.html'">
+            <h3> Transport Guide</h3>
+            <p>Fastest route + fare estimates</p>
+        </div>
+
+        <div class="card" onclick="window.location.href='recomm.html'">
+            <h3> Smart Suggestions</h3>
+            <p>Choose your vibe</p>
+        </div>
+
+        <div class="card" onclick="window.location.href='risk.html'">
+            <h3> Area Heatmap</h3>
+            <p>Safety rating Area wise</p>
         </div>
 
         <div class="card disabled">
-            <h3> Smart Suggestions </h3>
-            <p> Coming Soon</p>
-        </div>
-
-        <div class="card disabled">
-            <h3> Area wise heatmap </h3>
-            <p>Coming Soon</p>
-        </div>
-
-        <div class="card disabled">
-            <h3> New features.. </h3>
+            <h3> More Features</h3>
             <p>Coming Soon</p>
         </div>
 
     </div>
 
 </div>
-
-<script>
-function goBudget() {
-    window.location.href = "budget.html";
-}
-
-function goRoute() {
-    window.location.href = "route.html";
-}
-</script>
 
 </body>
 </html>

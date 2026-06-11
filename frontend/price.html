@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Price Scam Detector — TravelWise</title>
+    <link rel="stylesheet" href="modules.css">
+    <link rel="stylesheet" href="scam.css">
+</head>
+<body class="scam-body">
+
+<div class="scam-wrap">
+
+    <header class="scam-header">
+        <a href="city.html" class="back-btn">← Back</a>
+        <h1> Price Scam Detector</h1>
+        <p>Know the fair price before you pay</p>
+    </header>
+
+    <section class="scam-form card-glass">
+
+        <div class="form-group">
+            <label>Select Item / Service</label>
+            <select id="category">
+                <option value="">Loading categories...</option>
+            </select>
+        </div>
+
+        <div class="factors-row">
+            <div class="form-group">
+                <label>Quality <span class="hint">1=basic · 5=premium</span></label>
+                <div class="rating-strip" id="quality-strip" data-key="quality"></div>
+                <input type="hidden" id="quality" value="3">
+            </div>
+            <div class="form-group">
+                <label>Location <span class="hint">1=remote · 5=Tapovan</span></label>
+                <div class="rating-strip" id="location-strip" data-key="location"></div>
+                <input type="hidden" id="location" value="3">
+            </div>
+            <div class="form-group">
+                <label>Season <span class="hint">1=off-season · 5=peak</span></label>
+                <div class="rating-strip" id="season-strip" data-key="season"></div>
+                <input type="hidden" id="season" value="3">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Vendor's Asking Price (₹)</label>
+            <input type="number" id="offered" placeholder="e.g. 1800" min="1">
+        </div>
+
+        <button id="check-btn" onclick="checkPrice()">Check Price 🔎</button>
+
+    </section>
+
+    <!-- Factor guide -->
+    <details class="factor-guide card-glass">
+        <summary> Factor Rating Guide</summary>
+        <div class="guide-grid">
+            <div>
+                <strong>Quality (1-5)</strong>
+                <p>1 = uncertified / poor gear<br>3 = average condition<br>5 = certified, brand-new, expert staff</p>
+            </div>
+            <div>
+                <strong>Location (1-5)</strong>
+                <p>1 = remote / bypass roads<br>3 = Ram Jhula zone<br>5 = Tapovan (premium hub)</p>
+            </div>
+            <div>
+                <strong>Season (1-5)</strong>
+                <p>1 = monsoon off-season<br>3 = shoulder season<br>5 = Oct-Nov peak / Yoga Festival</p>
+            </div>
+        </div>
+    </details>
+
+    <!-- Loader -->
+    <div id="loader" class="loader hidden">
+        <div class="spinner"></div><p>Analysing price...</p>
+    </div>
+
+    <!-- Error -->
+    <div id="error-box" class="error-box hidden"></div>
+
+    <!-- Result card -->
+    <section id="result-section" class="hidden">
+        <div class="verdict-card" id="verdict-card">
+
+            <div class="verdict-header">
+                <span id="verdict-badge"></span>
+                <span id="deviation-pct"></span>
+            </div>
+
+            <div class="price-row">
+                <div class="price-box">
+                    <div class="price-label">Fair Price</div>
+                    <div class="price-val" id="fair-price"></div>
+                </div>
+                <div class="price-box">
+                    <div class="price-label">Acceptable Range</div>
+                    <div class="price-val" id="range-val"></div>
+                </div>
+                <div class="price-box">
+                    <div class="price-label">You Were Quoted</div>
+                    <div class="price-val" id="offered-val"></div>
+                </div>
+            </div>
+
+            <div class="verdict-msg" id="verdict-msg"></div>
+            <div class="insight-box"> <span id="insight-text"></span></div>
+            <div class="tip-box"> Local Tip: <span id="tip-text"></span></div>
+
+        </div>
+    </section>
+
+</div>
+
+<script>
+const API = "http://127.0.0.1:5000";
+
+async function loadCategories() {
+    try {
+        const res = await fetch(`${API}/scam/categories`);
+        const json = await res.json();
+        const sel = document.getElementById("category");
+        sel.innerHTML = '<option value="">Choose a product / service</option>';
+        json.categories.forEach(c => {
+            sel.innerHTML += `<option value="${c.id}">${c.description} (base ₹${c.base_price})</option>`;
+        });
+    } catch(e) {
+        document.getElementById("category").innerHTML = '<option value="">Server offline</option>';
+    }
+}
+
+
+function initStrips() {
+
+    const configs = [
+
+        {
+            id: "quality-strip",
+            key: "quality",
+            labels: [
+                "Basic",
+                "Average",
+                "Good",
+                "Premium",
+                "Luxury"
+            ]
+        },
+
+        {
+            id: "location-strip",
+            key: "location",
+            labels: [
+                "Remote",
+                "Local",
+                "Popular",
+                "Tourist",
+                "Tapovan"
+            ]
+        },
+
+        {
+            id: "season-strip",
+            key: "season",
+            labels: [
+                "Off",
+                "Low",
+                "Normal",
+                "Busy",
+                "Peak"
+            ]
+        }
+    ];
+
+    configs.forEach(cfg => {
+
+        const strip =
+            document.getElementById(cfg.id);
+
+        strip.innerHTML = "";
+
+        for(let i = 1; i <= 5; i++) {
+
+            const btn =
+                document.createElement("button");
+
+            btn.type = "button";
+
+            btn.className =
+                "dot" + (i === 3 ? " active" : "");
+
+            btn.innerHTML = `
+
+                <div style="
+                    font-size:18px;
+                    font-weight:bold;
+                ">
+                    ${i} ⭐
+                </div>
+
+                <small style="
+                    color:#cbd5e1;
+                    font-size:11px;
+                ">
+                    ${cfg.labels[i-1]}
+                </small>
+            `;
+
+            btn.onclick = () => {
+
+                strip
+                    .querySelectorAll(".dot")
+                    .forEach(d =>
+                        d.classList.remove("active")
+                    );
+
+                btn.classList.add("active");
+
+                document
+                    .getElementById(cfg.key)
+                    .value = i;
+            };
+
+            strip.appendChild(btn);
+        }
+    });
+}
+
+
+async function checkPrice() {
+    const categoryId = document.getElementById("category").value;
+    const quality    = +document.getElementById("quality").value;
+    const location   = +document.getElementById("location").value;
+    const season     = +document.getElementById("season").value;
+    const offered    = +document.getElementById("offered").value;
+
+    if (!categoryId)     return showError("Please select a category.");
+    if (!offered || offered <= 0) return showError("Please enter the vendor's asking price.");
+
+    setLoading(true);
+    hideError();
+    document.getElementById("result-section").classList.add("hidden");
+
+    try {
+        const res = await fetch(`${API}/scam/detect`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ category_id: +categoryId, quality, location, season, offered_price: offered })
+        });
+        const json = await res.json();
+        if (json.status !== "success") throw new Error(json.message);
+        renderResult(json.data);
+    } catch(e) {
+        showError("Error: " + e.message);
+    } finally {
+        setLoading(false);
+    }
+}
+
+function renderResult(d) {
+    const colorMap = { red: "#ff4444", orange: "#ff8800", yellow: "#f5a623", green: "#22c55e" };
+    const color = colorMap[d.verdict_color] || "#888";
+
+    const card = document.getElementById("verdict-card");
+    card.style.borderColor = color;
+
+    document.getElementById("verdict-badge").textContent  = d.verdict;
+    document.getElementById("verdict-badge").style.background = color;
+    document.getElementById("deviation-pct").textContent  = 
+        (d.deviation_pct >= 0 ? "+" : "") + d.deviation_pct + "%";
+    document.getElementById("deviation-pct").style.color  = color;
+
+    document.getElementById("fair-price").textContent  = "₹" + fmt(d.fair_price);
+    document.getElementById("range-val").textContent   = "₹" + fmt(d.acceptable_range.low) + " – ₹" + fmt(d.acceptable_range.high);
+    document.getElementById("offered-val").textContent = "₹" + fmt(d.offered_price);
+    document.getElementById("offered-val").style.color = color;
+
+    document.getElementById("verdict-msg").textContent  = d.message;
+    document.getElementById("insight-text").textContent = d.insight;
+    document.getElementById("tip-text").textContent     = d.local_tip;
+
+    document.getElementById("result-section").classList.remove("hidden");
+    document.getElementById("result-section").scrollIntoView({ behavior: "smooth" });
+}
+
+function fmt(n) { return Number(n).toLocaleString("en-IN"); }
+function setLoading(on) {
+    document.getElementById("loader").classList.toggle("hidden", !on);
+    document.getElementById("check-btn").disabled = on;
+}
+function showError(msg) {
+    const el = document.getElementById("error-box");
+    el.textContent = msg; el.classList.remove("hidden");
+}
+function hideError() { document.getElementById("error-box").classList.add("hidden"); }
+
+window.addEventListener("DOMContentLoaded", () => { loadCategories(); initStrips(); });
+</script>
+</body>
+</html>

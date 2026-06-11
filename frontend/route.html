@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Transport Guide — TravelWise</title>
+    <link rel="stylesheet" href="modules.css">
+    <link rel="stylesheet" href="route.css">
+    <style>
+        .route-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin: 1.25rem 0;
+        }
+        @media (max-width: 640px) {
+            .route-stats { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .stat-box {
+            background: var(--glass, rgba(255,255,255,0.08));
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 14px;
+            padding: 1.1rem 1rem;
+            text-align: center;
+            transition: transform .2s, box-shadow .2s;
+        }
+        .stat-box:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.18); }
+
+        .stat-val {
+            display: block;
+            font-size: 1.55rem;
+            font-weight: 700;
+            color: var(--accent, #4f9dff);
+            letter-spacing: -.5px;
+        }
+        .stat-label {
+            display: block;
+            font-size: .78rem;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            opacity: .65;
+            margin-top: .3rem;
+        }
+
+        .map-container {
+            width: 100%;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(0,0,0,.2);
+            margin-top: .5rem;
+            border: 1px solid rgba(255,255,255,0.12);
+        }
+        #map-frame {
+            width: 100%;
+            height: 420px;
+            border: none;
+            display: block;
+        }
+
+        .fare-table { margin-top: 1.25rem; }
+        .fare-table h3 { margin-bottom: .75rem; font-size: 1rem; opacity: .9; }
+        .fare-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .9rem;
+        }
+        .fare-table th, .fare-table td {
+            padding: .55rem .8rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,.08);
+        }
+        .fare-table thead th { opacity: .55; font-weight: 600; font-size: .78rem; text-transform: uppercase; }
+        .fare-table tr.active-row td { color: var(--accent, #4f9dff); font-weight: 700; }
+
+
+        .loader { text-align: center; padding: 2rem; }
+        .spinner {
+            width: 40px; height: 40px;
+            border: 4px solid rgba(255,255,255,.15);
+            border-top-color: var(--accent, #4f9dff);
+            border-radius: 50%;
+            animation: spin .75s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .error-box {
+            background: rgba(255,80,80,.12);
+            border: 1px solid rgba(255,80,80,.35);
+            border-radius: 10px;
+            padding: .85rem 1rem;
+            color: #ff8080;
+            margin-top: 1rem;
+            font-size: .9rem;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body class="route-body">
+
+<div class="route-wrap">
+
+    <header class="route-header">
+        <a href="city.html" class="back-btn">← Back</a>
+        <h1>🚌 Transport Guide</h1>
+        <p>Fastest route + fair fare estimates in Rishikesh</p>
+    </header>
+
+
+    <section class="route-form card-glass">
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>From</label>
+                <input type="text" id="source"
+                       placeholder="e.g. Laxman Jhula" list="places-list">
+            </div>
+            <div class="swap-btn" onclick="swapPlaces()" title="Swap">⇄</div>
+            <div class="form-group">
+                <label>To</label>
+                <input type="text" id="destination"
+                       placeholder="e.g. Triveni Ghat" list="places-list">
+            </div>
+        </div>
+
+        <datalist id="places-list">
+            <option value="Laxman Jhula">
+            <option value="Ram Jhula">
+            <option value="Triveni Ghat">
+            <option value="Tapovan">
+            <option value="AIIMS Rishikesh">
+            <option value="Rishikesh Railway Station">
+            <option value="Beatles Ashram">
+            <option value="Neer Waterfall">
+            <option value="Jumpin Heights Bungee">
+            <option value="Parmarth Niketan">
+        </datalist>
+
+        <div class="form-group" style="margin-top:1rem;">
+            <label>Vehicle Type</label>
+            <div class="vehicle-grid">
+                <label class="veh-opt">
+                    <input type="radio" name="vehicle" value="rickshaw" checked>
+                    <span>🛺 Rickshaw</span>
+                    <small>₹20 + ₹10/km</small>
+                </label>
+                <label class="veh-opt">
+                    <input type="radio" name="vehicle" value="vikram">
+                    <span>🚐 Vikram</span>
+                    <small>₹10 + ₹8/km</small>
+                </label>
+                <label class="veh-opt">
+                    <input type="radio" name="vehicle" value="magic">
+                    <span>🚌 Magic</span>
+                    <small>₹15 + ₹9/km</small>
+                </label>
+                <label class="veh-opt">
+                    <input type="radio" name="vehicle" value="bus">
+                    <span>🚎 Bus</span>
+                    <small>₹5/km</small>
+                </label>
+            </div>
+        </div>
+
+        <button id="route-btn" onclick="getRoute()">Find Route </button>
+    </section>
+
+ 
+    <div id="loader" class="loader hidden">
+        <div class="spinner"></div>
+        <p>Fetching OSM map data &amp; computing route…</p>
+        <small>This may take 30–60 seconds</small>
+    </div>
+
+    <div id="error-box" class="error-box hidden"></div>
+
+    <section id="result-section" class="hidden">
+
+
+        <div class="route-stats">
+            <div class="stat-box">
+                <span id="stat-dist"    class="stat-val">—</span>
+                <span class="stat-label">Distance</span>
+            </div>
+            <div class="stat-box">
+                <span id="stat-eta"     class="stat-val">—</span>
+                <span class="stat-label">ETA</span>
+            </div>
+            <div class="stat-box">
+                <span id="stat-fare"    class="stat-val">—</span>
+                <span class="stat-label">Est. Fare</span>
+            </div>
+            <div class="stat-box">
+                <span id="stat-vehicle" class="stat-val">—</span>
+                <span class="stat-label">Vehicle</span>
+            </div>
+        </div>
+
+        <div id="fare-compare" class="fare-table hidden"></div>
+
+        <div class="map-container">
+            <iframe id="map-frame"
+                    sandbox="allow-scripts allow-same-origin"
+                    referrerpolicy="no-referrer"
+                    title="Route map"></iframe>
+        </div>
+
+    </section>
+
+</div>
+
+
+<script>
+
+const API = "http://127.0.0.1:5000";
+
+const FARES = {
+    rickshaw: { base: 20, per_km: 10, icon: "🛺" },
+    vikram:   { base: 10, per_km:  8, icon: "🚐" },
+    magic:    { base: 15, per_km:  9, icon: "🚌" },
+    bus:      { base:  0, per_km:  5, icon: "🚎" },
+};
+
+function swapPlaces() {
+    const s = document.getElementById("source");
+    const d = document.getElementById("destination");
+    [s.value, d.value] = [d.value, s.value];
+}
+
+function setLoading(on) {
+    document.getElementById("loader").classList.toggle("hidden", !on);
+    document.getElementById("route-btn").disabled = on;
+}
+
+function showError(msg) {
+    const el = document.getElementById("error-box");
+    el.textContent = "⚠ " + msg;
+    el.classList.remove("hidden");
+}
+
+function hideError() {
+    document.getElementById("error-box").classList.add("hidden");
+}
+
+function hideResult() {
+    document.getElementById("result-section").classList.add("hidden");
+    document.getElementById("fare-compare").classList.add("hidden");
+}
+
+async function getRoute() {
+    const source      = document.getElementById("source").value.trim();
+    const destination = document.getElementById("destination").value.trim();
+    const vehicle     = document.querySelector("input[name='vehicle']:checked").value;
+
+    if (!source || !destination) {
+        showError("Please enter both source and destination."); return;
+    }
+    if (source.toLowerCase() === destination.toLowerCase()) {
+        showError("Source and destination cannot be the same."); return;
+    }
+
+    setLoading(true);
+    hideError();
+    hideResult();
+
+    try {
+        const res = await fetch(`${API}/route`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ source, destination, vehicle })
+        });
+
+        if (!res.ok) {
+            let errMsg = `Server error ${res.status}`;
+            try {
+                const errJson = await res.json();
+                if (errJson.message) errMsg = errJson.message;
+            } catch (_) {}
+            throw new Error(errMsg);
+        }
+
+        const json = await res.json();
+
+        if (json.status !== "success") {
+            throw new Error(json.message || "Unknown error from server");
+        }
+
+        renderRoute(json.data);
+
+    } catch (e) {
+        showError(e.message);
+    } finally {
+        setLoading(false);
+    }
+}
+
+
+function renderRoute(d) {
+
+    document.getElementById("stat-dist").textContent =
+        (d.distance_km != null) ? Number(d.distance_km).toFixed(2) + " km" : "—";
+
+    document.getElementById("stat-eta").textContent =
+        (d.eta_min != null) ? Math.round(d.eta_min) + " min" : "—";
+
+    document.getElementById("stat-fare").textContent =
+        (d.fare != null) ? "₹" + Math.round(d.fare) : "—";
+
+    const veh = d.vehicle || "rickshaw";
+    document.getElementById("stat-vehicle").textContent =
+        `${FARES[veh]?.icon || "🚌"} ${veh.charAt(0).toUpperCase() + veh.slice(1)}`;
+
+    if (d.distance_km != null) {
+        const rows = Object.entries(FARES).map(([k, f]) => {
+            const total  = Math.round(f.base + f.per_km * d.distance_km);
+            const active = (k === veh) ? "active-row" : "";
+            return `<tr class="${active}">
+                <td>${f.icon} ${k.charAt(0).toUpperCase() + k.slice(1)}</td>
+                <td>₹${total}</td>
+            </tr>`;
+        }).join("");
+
+        document.getElementById("fare-compare").innerHTML = `
+            <h3> All-Vehicle Fare Comparison</h3>
+            <table>
+                <thead><tr><th>Vehicle</th><th>Estimated Fare</th></tr></thead>
+                <tbody>${rows}</tbody>
+            </table>`;
+        document.getElementById("fare-compare").classList.remove("hidden");
+    }
+
+
+    const frame = document.getElementById("map-frame");
+
+    if (d.map_html) {
+        if (frame._blobUrl) {
+            URL.revokeObjectURL(frame._blobUrl);
+            frame._blobUrl = null;
+        }
+        frame.removeAttribute("srcdoc");
+        frame.src = "";
+
+        setTimeout(() => {
+            const blob = new Blob([d.map_html], { type: "text/html" });
+            const url  = URL.createObjectURL(blob);
+            frame._blobUrl = url;
+            frame.src = url;
+        }, 50);
+    } else {
+        frame.src = "";
+        frame.srcdoc = "<p style='padding:1rem;font-family:sans-serif;color:#888'>Map not available</p>";
+    }
+
+    const resultSection = document.getElementById("result-section");
+    resultSection.classList.remove("hidden");
+    resultSection.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+</script>
+
+</body>
+</html>
